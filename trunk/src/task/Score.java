@@ -67,5 +67,27 @@ public class Score {
     public long getTimestamp() {
         return timestamp;
     }
-    
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + this.userId;
+        hash = 97 * hash + this.itemId;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Score other = (Score) obj;
+        if (this.userId != other.userId) {
+            return false;
+        }
+        return this.itemId == other.itemId;
+    }
 }

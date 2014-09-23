@@ -34,6 +34,14 @@ public class EstimationPool {
          * Кол-во символов после запятой при округлении десятичных дробей.
          */
         private static final int symbolsAfterComma = 3;
+        /**
+         * Кол-во использованных алгоритмов.
+         */
+        private static final int algoCnt = 5;
+        /**
+         * Кол-во использованных оценок.
+         */
+        private static final int estCnt = 4;
     }
     /**
      * Instance для Singleton-класса.
@@ -59,7 +67,7 @@ public class EstimationPool {
      * Создать новую строку в матрице оценок.
      */
     public void createNewEmptyEstimation(){
-        this.estimations.add(new ArrayList<>());
+        this.estimations.add(new ArrayList<Integer>());
     }
     
     /**
@@ -97,12 +105,16 @@ public class EstimationPool {
         setEstimation(3, rating);
     }
     
+    public void setBaselinePredictor(int rating){
+        setEstimation(4, rating);
+    }
+    
     /**
      * Сохранить эталонную оценку пользователем этого item'a.
      * @param rating значение оценки.
      */
     public void setTrueRating(int rating){
-        setEstimation(4, rating);
+        setEstimation(5, rating);
     }
     
     /**
@@ -113,6 +125,7 @@ public class EstimationPool {
      *  <li>средняя оценка для каждого item,</li>
      *  <li>средняя оценка для каждого пользователя,</li>
      *  <li>random,</li>
+     *  <li>baseline predictor,</li>
      *  <li>эталонная пользовательская оценка.</li>
      * </ul>
      * @param rating значение оценки.
@@ -137,10 +150,14 @@ public class EstimationPool {
         return sb.toString();
     }
     
+    private double countDiff(List<Integer> est, int algoType){
+        return est.get(algoType - 1) - est.get(Const.algoCnt);
+    }
+    
     private double countMAE(int algoType){
         int sum = 0;
         for(List<Integer> est: estimations){
-            sum += Math.abs(est.get(algoType - 1) - est.get(4));
+            sum += Math.abs(countDiff(est, algoType));
         }
         return (double)sum / estimations.size();
     }
@@ -148,7 +165,7 @@ public class EstimationPool {
     private double countRMSE(int algoType){
         int sum = 0;
         for(List<Integer> est: estimations){
-            sum += Math.pow(est.get(algoType - 1) - est.get(4), 2.0);
+            sum += Math.pow(countDiff(est, algoType), 2.0);
         }
         return Math.sqrt((double)sum / estimations.size());
     }
@@ -166,7 +183,7 @@ public class EstimationPool {
      */
     public List<List<Double>> countEstimations(){
         List<List<Double>> algoEst = new ArrayList<>();
-        for(int i=1; i<5; i++){
+        for(int i=1; i<Const.algoCnt + 1; i++){
             List<Double> estim = new ArrayList<>();
             double mae = countMAE(i);
             double rmse = countRMSE(i);
@@ -187,7 +204,7 @@ public class EstimationPool {
      */
     public String estimatesToString(List<List<Double>> estimates){
         StringBuilder sb = new StringBuilder("MAE \t NMAE \t RMSE \t NRMSE\n");
-        for(int i=0; i<4; i++){
+        for(int i=0; i<Const.algoCnt; i++){
             for(double est: estimates.get(i)){
                 sb.append(Utils.roundDouble(est, Const.symbolsAfterComma));
                 sb.append("\t");
@@ -206,6 +223,10 @@ public class EstimationPool {
                     break;
                 }
                 case 3:{
+                    sb.append("- baseline predictor");
+                    break;
+                }
+                case 4:{
                     sb.append("- random rating");
                     break;
                 }

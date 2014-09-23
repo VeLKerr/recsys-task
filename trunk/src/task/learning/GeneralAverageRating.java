@@ -72,13 +72,30 @@ public class GeneralAverageRating extends AverageRating{
      * @param isUser флаг, указывающий на то, пользователь это или item.
      * @return среднюю оценку.
      */
-    public int avgOn(int id, boolean isUser){
+    public double avgOn(int id, boolean isUser){
         for(ItemOrUser iou: ious){
             if(iou.getId() == id && iou.isUser() == isUser){
                 return iou.avg();
             }
         }
         return Utils.randomRating();
+    }
+    
+    private double countGeneralPart(){
+        double UserSum = 0.0;
+        int userCnt = 0;
+        for(ItemOrUser iou: ious){
+            if(iou.isUser()){
+                UserSum += iou.avg();
+                userCnt++;
+            }
+        }
+        return UserSum / userCnt;
+    }
+    
+    public double countBaselinePredictor(int userId, int itemId){
+        return avgOn(userId, true) + avgOn(itemId, false) - 
+               countGeneralPart();
     }
     
     /**
