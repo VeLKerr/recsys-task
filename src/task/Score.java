@@ -1,6 +1,5 @@
 package task;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -9,7 +8,7 @@ import java.util.StringTokenizer;
  * или другого файлам с идентичной структурой.)
  * @author Ivchenko Oleg (Kirius VeLKerr)
  */
-public class Score {
+public class Score implements Comparable<Score>{
     /**
      * Объект для парсинга строк
      */
@@ -17,8 +16,8 @@ public class Score {
     
     private final int userId;
     private final int itemId;
-    private final int rating;
-    private final long timestamp;
+    private int rating;
+    private long timestamp;
     
     /**
      * Конструктор
@@ -38,19 +37,6 @@ public class Score {
         this.rating = estimate;
         this.timestamp = timestamp;
     }
-    
-    /**
-     * Являются ли 2 объекта похожими?
-     * Имеется в виду, что в обоих случаях один и тот же пользователь
-     * оценивал один и тот же item только в разное время.
-     * @param score1
-     * @param score2
-     * @return 
-     */
-    public static boolean isSimilar(Score score1, Score score2){
-        return score1.userId == score2.userId && 
-               score1.itemId == score2.itemId;
-    }
 
     public int getUserId() {
         return userId;
@@ -67,12 +53,55 @@ public class Score {
     public long getTimestamp() {
         return timestamp;
     }
+    
+    public static boolean addToList(List<Score> scores, Score score){
+        if(scores.contains(score)){
+            return false;
+        }
+        scores.add(score);
+        return true;
+    }
+    
+    @Deprecated
+    public static boolean addToListComp(List<Score> scores, Score score){
+        for(Score sc: scores){
+            if(score.compareTo(sc) > 0){
+                sc.timestamp = score.timestamp;
+                sc.rating = score.rating;
+                return true;
+            }
+            else if(score.compareTo(sc) < 0){
+                return false;
+            }
+        }
+        scores.add(score);
+        return true;
+    }
+    
+    /**
+     * Метод для сравнения одинаковых оценок по времени. Сравниваются только те 
+     * оценки, к которых userId и itemId равны.
+     * @param o сравниваемая с текущей оценка.
+     * @return результат сравнения.
+     */
+    @Override
+    public int compareTo(Score o) {
+       if(o.userId == userId && o.itemId == itemId){
+           if(o.timestamp > timestamp){
+               return 1;
+           }
+           else{
+               return -1;
+           }
+       }
+       return 0;
+    }
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 97 * hash + this.userId;
-        hash = 97 * hash + this.itemId;
+        int hash = 3;
+        hash = 89 * hash + this.userId;
+        hash = 89 * hash + this.itemId;
         return hash;
     }
 
@@ -88,6 +117,10 @@ public class Score {
         if (this.userId != other.userId) {
             return false;
         }
-        return this.itemId == other.itemId;
+        if (this.itemId != other.itemId) {
+            return false;
+        }
+        return true;
     }
+    
 }
