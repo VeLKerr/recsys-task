@@ -40,7 +40,7 @@ public class AverageRating {
      * Расчёт среднего значения оценок.
      * @return среднее значение оценок.
      */
-    public int avg(){
-        return Utils.round((double)sum / (double)cnt);
+    public double avg(){
+        return (double) sum / (double)cnt;
     }
 }

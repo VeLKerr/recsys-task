@@ -26,6 +26,10 @@ public class Task {
      * Путь к файлам с выборками.
      */
     private static final String path = "ml-100k/";
+    /**
+     * Кол-во прогонов обучения-тестирования.
+     */
+    private static final int testCnt = 5;
 
     /**
      * @param args the command line arguments
@@ -35,7 +39,7 @@ public class Task {
         EstimationPool est = EstimationPool.getEstimationPool();
         Score sc  = null; 
         String line = null;
-        for(int i=1; i<=5; i++){//change to 5
+        for(int i=1; i<=1; i++){//change to 5
             //Обучение
             GeneralAverageRating gav = new GeneralAverageRating();
             fnb.setParameters(i, false);
@@ -52,12 +56,15 @@ public class Task {
             while((line = br.readLine()) != null){
                 sc = new Score(line);
                 est.createNewEmptyEstimation();
-                est.setAverage(gav.avg()); //эта оценка практически не меняется, 
+                est.setAverage(Utils.round(gav.avg())); //эта оценка практически не меняется, 
                 //но я всё равно рассчитываю её каждый раз т.к. теоретически она
                 //измениться может.
-                est.setAverageOverItems(gav.avgOn(sc.getItemId(), false));
-                est.setAverageOverUsers(gav.avgOn(sc.getUserId(), true));
+                est.setAverageOverItems(Utils.round(gav.avgOn(sc.getItemId(), false)));
+                est.setAverageOverUsers(Utils.round(gav.avgOn(sc.getUserId(), true)));
                 est.setAverageRandom(Utils.randomRating());
+                est.setBaselinePredictor(Utils.round(gav.countBaselinePredictor(
+                        sc.getUserId(), sc.getItemId())));
+                System.out.println(Utils.round(gav.countBaselinePredictor(sc.getUserId(), sc.getItemId())));
                 est.setTrueRating(sc.getRating());
                 gav.add(sc); //дообучение системы
             }
