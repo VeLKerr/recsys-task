@@ -4,6 +4,7 @@ package task.estimations;
 import java.util.ArrayList;
 import java.util.List;
 import task.utils.Utils;
+import static task.Task.beta;
 
 /**
  * Singleton-класс для храниения спрогнозированных оценок и эталонной оценки пользователя.
@@ -37,7 +38,7 @@ public class EstimationPool {
         /**
          * Кол-во использованных алгоритмов.
          */
-        private static final int algoCnt = 5;
+        private static final int algoCnt = 6;
         /**
          * Кол-во использованных оценок.
          */
@@ -109,12 +110,16 @@ public class EstimationPool {
         setEstimation(4, rating);
     }
     
+    public void setBaselinePredictorWithBeta(int rating){
+        setEstimation(5, rating);
+    }
+    
     /**
      * Сохранить эталонную оценку пользователем этого item'a.
      * @param rating значение оценки.
      */
     public void setTrueRating(int rating){
-        setEstimation(5, rating);
+        setEstimation(Const.algoCnt, rating);
     }
     
     /**
@@ -227,6 +232,11 @@ public class EstimationPool {
                     break;
                 }
                 case 4:{
+                    sb.append("- baseline predictor with BETA=");
+                    sb.append(beta);
+                    break;
+                }
+                case 5:{
                     sb.append("- random rating");
                     break;
                 }
