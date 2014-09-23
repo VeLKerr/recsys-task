@@ -131,6 +131,7 @@ public class EstimationPool {
      *  <li>средняя оценка для каждого пользователя,</li>
      *  <li>random,</li>
      *  <li>baseline predictor,</li>
+     * <li>baseline predictor с коэффициентом затухания Бета,</li>
      *  <li>эталонная пользовательская оценка.</li>
      * </ul>
      * @param rating значение оценки.
@@ -228,16 +229,16 @@ public class EstimationPool {
                     break;
                 }
                 case 3:{
-                    sb.append("- baseline predictor");
+                    sb.append("- random rating");
                     break;
                 }
                 case 4:{
-                    sb.append("- baseline predictor with BETA=");
-                    sb.append(beta);
+                    sb.append("- baseline predictor");
                     break;
                 }
                 case 5:{
-                    sb.append("- random rating");
+                    sb.append("- baseline predictor with BETA=");
+                    sb.append(beta);
                     break;
                 }
             }

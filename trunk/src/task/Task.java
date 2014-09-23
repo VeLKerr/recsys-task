@@ -27,7 +27,7 @@ public class Task {
     /**
      * Путь к файлам с выборками.
      */
-    private static final String path = "ml-100k/";
+    public static final String path = "ml-100k/";
     /**
      * Кол-во прогонов обучения-тестирования.
      */
@@ -35,8 +35,17 @@ public class Task {
     
     /**
      * Коэффициент затухания Бета.
+     * Не смотря на то, что пишет Simon Funk (http://sifter.org/~simon/journal/20061211.html),
+     * Бета = 25 на данной выборке даёт большую погрешность, чем даже Бета = 0.
+     * 
+     * Я поставил Бета = -0.25. Это связано с тем, что базовый предиктор иногда
+     * выходит за рамки шкалы (становится > 5). Если поставить такую Бета, знаменатели
+     * дробей увеличатся и 
+     * некоторые из этих больших чисел при округлении всё-таки станут давать 5,
+     * с другой стороны при таком Бета на этой выборке у меня не возникало нулевых 
+     * рекомендаций.
      */
-    public static final double beta = 25.0;
+    public static final double beta = -0.25;
 
     /**
      * @param args the command line arguments
@@ -44,10 +53,9 @@ public class Task {
     public static void main(String[] args) throws FileNotFoundException, IOException {
         FileNameBuilder fnb = FileNameBuilder.getBuilder();
         EstimationPool est = EstimationPool.getEstimationPool();
-        List<Score> scores = new ArrayList<>();
-        Score sc  = null; 
         String line = null;
-        for(int i=1; i<=1; i++){//change to testCnt
+        Score sc  = null;
+        for(int i=1; i<=testCnt; i++){//change to testCnt
             //Обучение
             GeneralAverageRating gav = new GeneralAverageRating();
             fnb.setParameters(i, false);
@@ -55,9 +63,7 @@ public class Task {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(data)));
             while((line = br.readLine()) != null){
                 sc = new Score(line);
-                if(Score.addToList(scores, sc)){
-                    gav.add(sc);
-                }
+                gav.add(sc);
             }
             //Тестировка и дообучение
             fnb.setIsTest(true);
@@ -74,7 +80,7 @@ public class Task {
                 est.setAverageRandom(Utils.randomRating());
                 est.setBaselinePredictor(Utils.round(gav.countBaselinePredictor(
                         sc.getUserId(), sc.getItemId())));
-                est.setBaselinePredictor(Utils.round(gav.countBaselinePredictor(
+                est.setBaselinePredictorWithBeta(Utils.round(gav.countBaselinePredictor(
                         sc.getUserId(), sc.getItemId(), beta)));
                 est.setTrueRating(sc.getRating());
                 gav.add(sc); //дообучение системы

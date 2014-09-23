@@ -59,9 +59,12 @@ public class GeneralAverageRating extends AverageRating{
         if(!itemFlag){
             ItemOrUser it = new ItemOrUser(score.getItemId(), false);
             it.add(score.getRating());
+            ious.add(it);
+
+        }
+        if(!userFlag){
             ItemOrUser us = new ItemOrUser(score.getUserId(), true);
             us.add(score.getRating());
-            ious.add(it);
             ious.add(us);
         }
     }
@@ -133,5 +136,28 @@ public class GeneralAverageRating extends AverageRating{
      */
     public int getCnt() {
         return cnt;
+    }
+    
+    /**
+     * Для тестирования. 
+     * @return 
+     */
+    public int _size(){
+        return ious.size();
+    }
+    
+    /**
+     * Для тестирования. 
+     * @return 
+     */
+    public boolean _check(){
+        for(ItemOrUser iou1:ious){
+            for(ItemOrUser iou2:ious){
+                if(iou1.getId() == iou2.getId() && iou1.isUser() == iou2.isUser()){
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

@@ -47,7 +47,12 @@ public class FileNameBuilder {
      */
     public String buildFName(){
         StringBuilder sb = new StringBuilder("u");
-        sb.append(number);
+        if(number != 0){
+            sb.append(number);
+        }
+        else{
+            return sb.append(".data").toString();
+        }
         if(isTest){
             sb.append(ts);
         }
