@@ -54,6 +54,12 @@ public class Score implements Comparable<Score>{
         return timestamp;
     }
     
+    /**
+     * ПРОВЕРЕНО!!! В выборкие нет случая, чтобы один и тот же пользователь
+     * исправлял оценку одного и того же item'a (ставил другую оценку в другое
+     * время).
+     * @deprecated 
+     */
     public static boolean addToList(List<Score> scores, Score score){
         if(scores.contains(score)){
             return false;
@@ -62,7 +68,12 @@ public class Score implements Comparable<Score>{
         return true;
     }
     
-    @Deprecated
+    /**
+     * ПРОВЕРЕНО!!! В выборкие нет случая, чтобы один и тот же пользователь
+     * исправлял оценку одного и того же item'a (ставил другую оценку в другое
+     * время).
+     * @deprecated 
+     */
     public static boolean addToListComp(List<Score> scores, Score score){
         for(Score sc: scores){
             if(score.compareTo(sc) > 0){
