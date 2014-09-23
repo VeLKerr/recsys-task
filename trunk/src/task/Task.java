@@ -12,6 +12,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import task.estimations.EstimationPool;
 import task.learning.GeneralAverageRating;
 import task.utils.FileNameBuilder;
@@ -42,9 +44,10 @@ public class Task {
     public static void main(String[] args) throws FileNotFoundException, IOException {
         FileNameBuilder fnb = FileNameBuilder.getBuilder();
         EstimationPool est = EstimationPool.getEstimationPool();
+        List<Score> scores = new ArrayList<>();
         Score sc  = null; 
         String line = null;
-        for(int i=1; i<=1; i++){//change to 5
+        for(int i=1; i<=1; i++){//change to testCnt
             //Обучение
             GeneralAverageRating gav = new GeneralAverageRating();
             fnb.setParameters(i, false);
@@ -52,7 +55,9 @@ public class Task {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(data)));
             while((line = br.readLine()) != null){
                 sc = new Score(line);
-                gav.add(sc);
+                if(Score.addToList(scores, sc)){
+                    gav.add(sc);
+                }
             }
             //Тестировка и дообучение
             fnb.setIsTest(true);
