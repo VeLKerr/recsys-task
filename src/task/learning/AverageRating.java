@@ -1,8 +1,6 @@
 
 package task.learning;
 
-import task.utils.Utils;
-
 /**
  * Класс для хранения данных для рассчёта средних оценок.
  * Среднее арифметическое рассчитывается как сумма чисел, делённая на их кол-во.
@@ -42,5 +40,14 @@ public class AverageRating {
      */
     public double avg(){
         return (double) sum / (double)cnt;
+    }
+    
+    /**
+     * Расчёт среднего значения оценок.
+     * @param beta коэффициент затухания Бета.
+     * @return среднее значение оценок.
+     */
+    protected double avg(double beta){
+        return (double) sum / (cnt + beta);
     }
 }

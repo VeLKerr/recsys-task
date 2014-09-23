@@ -81,6 +81,22 @@ public class GeneralAverageRating extends AverageRating{
         return Utils.randomRating();
     }
     
+    /**
+     * Рассчитать среднюю оценку.
+     * @param id пользователя или item'a.
+     * @param isUser флаг, указывающий на то, пользователь это или item.
+     * @param beta коэффициент затухания Бета.
+     * @return среднюю оценку.
+     */
+    private double avgOn(int id, boolean isUser, double beta){
+        for(ItemOrUser iou: ious){
+            if(iou.getId() == id && iou.isUser() == isUser){
+                return iou.avg(beta);
+            }
+        }
+        return Utils.randomRating();
+    }
+    
     private double countGeneralPart(){
         double UserSum = 0.0;
         int userCnt = 0;
@@ -95,6 +111,11 @@ public class GeneralAverageRating extends AverageRating{
     
     public double countBaselinePredictor(int userId, int itemId){
         return avgOn(userId, true) + avgOn(itemId, false) - 
+               countGeneralPart();
+    }
+    
+    public double countBaselinePredictor(int userId, int itemId, double beta){
+        return avgOn(userId, true, beta) + avgOn(itemId, false, beta) - 
                countGeneralPart();
     }
     

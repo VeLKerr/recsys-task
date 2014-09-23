@@ -30,6 +30,11 @@ public class Task {
      * Кол-во прогонов обучения-тестирования.
      */
     private static final int testCnt = 5;
+    
+    /**
+     * Коэффициент затухания Бета.
+     */
+    public static final double beta = 25.0;
 
     /**
      * @param args the command line arguments
@@ -64,7 +69,8 @@ public class Task {
                 est.setAverageRandom(Utils.randomRating());
                 est.setBaselinePredictor(Utils.round(gav.countBaselinePredictor(
                         sc.getUserId(), sc.getItemId())));
-                System.out.println(Utils.round(gav.countBaselinePredictor(sc.getUserId(), sc.getItemId())));
+                est.setBaselinePredictor(Utils.round(gav.countBaselinePredictor(
+                        sc.getUserId(), sc.getItemId(), beta)));
                 est.setTrueRating(sc.getRating());
                 gav.add(sc); //дообучение системы
             }
