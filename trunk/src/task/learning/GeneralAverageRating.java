@@ -121,15 +121,30 @@ public class GeneralAverageRating extends AverageRating{
         double predictor = countGeneralPart(beta);
         int ui = 0;
         int iu = 0;
+        //Флаги указывают на то, нашёлся ли в обучающей выборке такой 
+        //пользователь или такой item. Если не нашёлся, то соотв. слагаемое
+        //генерируем рандомно в диапазоне от 1 до 5.
+        boolean itemFlag = false;
+        boolean userFlag = false;
         for(ItemOrUser iou: ious){
             if(iou.getId() == userId && iou.isUser()){
                 predictor += iou.avg(beta);
                 ui = iou.cnt;
+                userFlag = true;
             }
             else if(iou.getId() == itemId && !iou.isUser()){
                 predictor += iou.avg(beta);
                 iu = iou.cnt;
+                itemFlag = true;
             }
+        }
+        if(!userFlag){
+            predictor += Utils.randomRating();
+            ui = 1;
+        }
+        if(!itemFlag){
+            predictor += Utils.randomRating();
+            iu = 1;
         }
         predictor += muMultiplier(ui, iu, beta) * avg();
         return predictor;
