@@ -45,7 +45,7 @@ public class Task {
      * с другой стороны при таком Бета на этой выборке у меня не возникало нулевых 
      * рекомендаций.
      */
-    public static final double beta = -0.25;
+    public static final double beta = Math.pow(10.0, 20.0);
 
     /**
      * @param args the command line arguments

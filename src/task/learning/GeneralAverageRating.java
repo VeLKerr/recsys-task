@@ -100,12 +100,12 @@ public class GeneralAverageRating extends AverageRating{
         return Utils.randomRating();
     }
     
-    private double countGeneralPart(){
+    private double countGeneralPart(double beta){
         double UserSum = 0.0;
         int userCnt = 0;
         for(ItemOrUser iou: ious){
             if(iou.isUser()){
-                UserSum += iou.avg();
+                UserSum += iou.avg(beta);
                 userCnt++;
             }
         }
@@ -114,12 +114,35 @@ public class GeneralAverageRating extends AverageRating{
     
     public double countBaselinePredictor(int userId, int itemId){
         return avgOn(userId, true) + avgOn(itemId, false) - 
-               countGeneralPart();
+               countGeneralPart(0.0);
     }
     
     public double countBaselinePredictor(int userId, int itemId, double beta){
-        return avgOn(userId, true, beta) + avgOn(itemId, false, beta) - 
-               countGeneralPart();
+        double predictor = countGeneralPart(beta);
+        int ui = 0;
+        int iu = 0;
+        for(ItemOrUser iou: ious){
+            if(iou.getId() == userId && iou.isUser()){
+                predictor += iou.avg(beta);
+                ui = iou.cnt;
+            }
+            else if(iou.getId() == itemId && !iou.isUser()){
+                predictor += iou.avg(beta);
+                iu = iou.cnt;
+            }
+        }
+        predictor += muMultiplier(ui, iu, beta) * avg();
+        return predictor;
+    }
+    
+    private double muMultiplier(int ui, int iu, double beta){
+        double uTerm = muTerm(ui, beta);
+        double iTerm = muTerm(iu, beta);
+        return uTerm * iTerm + 1 - iTerm - uTerm;
+    }
+    
+    private double muTerm(int number, double beta){
+        return (double) number / (number + beta);
     }
     
     /**
@@ -151,9 +174,12 @@ public class GeneralAverageRating extends AverageRating{
      * @return 
      */
     public boolean _check(){
-        for(ItemOrUser iou1:ious){
-            for(ItemOrUser iou2:ious){
-                if(iou1.getId() == iou2.getId() && iou1.isUser() == iou2.isUser()){
+        for(int i=0; i<ious.size(); i++){
+            for(int j=0; j<ious.size(); j++){
+                if(i != j && 
+                   ious.get(i).getId() == ious.get(j).getId() &&
+                   ious.get(i).isUser() == ious.get(j).isUser()){
+                    System.out.println(i + " " + j);
                     return false;
                 }
             }

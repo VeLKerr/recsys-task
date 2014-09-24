@@ -34,7 +34,7 @@ public class EstimationPool {
         /**
          * Кол-во символов после запятой при округлении десятичных дробей.
          */
-        private static final int symbolsAfterComma = 3;
+        private static final int symbolsAfterComma = 5;
         /**
          * Кол-во использованных алгоритмов.
          */
