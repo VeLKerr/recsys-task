@@ -32,18 +32,17 @@ public class Debug {
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
         String line = null;
         int lineCnt = 0;
-        List<Score> scores = new ArrayList<>();
         while((line = br.readLine()) != null){
             Score score = new Score(line);
+            us.add(score);
             lineCnt++;
-            if(Score.addToList(scores, score)){
-                System.out.println(us.add(score));
-                gav.add(score);
-            }
+//            System.out.println(us.add(score));
+            gav.add(score);
         }
         System.out.println(lineCnt);
         System.out.println(gav._size());
         System.out.println(gav._check());
+        gav._check();
         System.out.println(us.size());
     }
     
