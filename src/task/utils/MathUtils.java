@@ -16,7 +16,7 @@ import task.estimations.EstimationPool;
  * Класс утилит.
  * @author Ivchenko Oleg (Kirius VeLKerr)
  */
-public abstract class Utils {
+public abstract class MathUtils {
     /**
      * Экземпляр генератора случайных чисел.
      */

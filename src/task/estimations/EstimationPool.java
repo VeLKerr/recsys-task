@@ -1,11 +1,11 @@
 
 package task.estimations;
 
-import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import task.utils.Utils;
+import java.util.Map;
 import static task.Task.beta;
 
 /**
@@ -41,6 +41,10 @@ public class EstimationPool {
          * Кол-во использованных алгоритмов.
          */
         private static final int algoCnt = 6;
+        /**
+         * Названия предикторов. Для корректной работы программы, название
+         * эталонного предиктора должно иметь индекс <code>0</code>.
+         */
         private static final String[] algoNames = {
             "average values",
             "average over the items",
@@ -53,7 +57,7 @@ public class EstimationPool {
     /**
      * Матрица прогнозов оценок, рассчитанных с помощью разных алгоритмов.
      */
-    private final List<List<Integer>> estimations;
+    private final List<List<Double>> estimations;
     /**
      * Оценки алгоритмов.
      */
@@ -68,14 +72,14 @@ public class EstimationPool {
      * Создать новую строку в матрице оценок.
      */
     public void createNewEmptyEstimationsRow(){
-        this.estimations.add(new ArrayList<Integer>());
+        this.estimations.add(new ArrayList<Double>());
     }
     
     /**
      * Сохранить оценку, рассчитанную как среднее значение всех предыдущих.
      * @param rating значение оценки.
      */
-    public void setAverage(int rating){
+    public void setAverage(double rating){
         setEstimation(0, rating);
     }
     
@@ -84,7 +88,7 @@ public class EstimationPool {
      * item'a.
      * @param rating значение оценки.
      */
-    public void setAverageOverItems(int rating){
+    public void setAverageOverItems(double rating){
         setEstimation(1, rating);
     }
     
@@ -93,7 +97,7 @@ public class EstimationPool {
      * этим пользователем.
      * @param rating значение оценки.
      */
-    public void setAverageOverUsers(int rating){
+    public void setAverageOverUsers(double rating){
         setEstimation(2, rating);
     }
     
@@ -102,15 +106,15 @@ public class EstimationPool {
      * <code>Const.lowest</code> до <code>Const.highest</code>.
      * @param rating значение оценки.
      */
-    public void setAverageRandom(int rating){
+    public void setAverageRandom(double rating){
         setEstimation(3, rating);
     }
     
-    public void setBaselinePredictor(int rating){
+    public void setBaselinePredictor(double rating){
         setEstimation(4, rating);
     }
     
-    public void setBaselinePredictorWithBeta(int rating){
+    public void setBaselinePredictorWithBeta(double rating){
         setEstimation(5, rating);
     }
     
@@ -118,7 +122,7 @@ public class EstimationPool {
      * Сохранить эталонную оценку пользователем этого item'a.
      * @param rating значение оценки.
      */
-    public void setTrueRating(int rating){
+    public void setTrueRating(double rating){
         setEstimation(Const.algoCnt, rating);
     }
     
@@ -136,7 +140,7 @@ public class EstimationPool {
      * </ul>
      * @param rating значение оценки.
      */
-    private void setEstimation(int index, int rating){
+    private void setEstimation(int index, double rating){
         this.estimations.get(estimations.size() - 1).add(index, rating);
     }
     
@@ -147,8 +151,8 @@ public class EstimationPool {
     @Override
     public String toString(){
         StringBuilder sb = new StringBuilder();
-        for(List<Integer> est: estimations){
-            for(int e: est){
+        for(List<Double> est: estimations){
+            for(double e: est){
                 sb.append(e).append("  ");
             }
             sb.append("\n");
@@ -156,24 +160,24 @@ public class EstimationPool {
         return sb.toString();
     }
     
-    private double countDiff(List<Integer> est, int algoType){
+    private double countDiff(List<Double> est, int algoType){
         return est.get(algoType - 1) - est.get(Const.algoCnt);
     }
     
     private double countMAE(int algoType){
-        int sum = 0;
-        for(List<Integer> est: estimations){
+        double sum = 0;
+        for(List<Double> est: estimations){
             sum += Math.abs(countDiff(est, algoType));
         }
-        return (double)sum / estimations.size();
+        return sum / estimations.size();
     }
     
     private double countRMSE(int algoType){
-        int sum = 0;
-        for(List<Integer> est: estimations){
+        double sum = 0;
+        for(List<Double> est: estimations){
             sum += Math.pow(countDiff(est, algoType), 2.0);
         }
-        return Math.sqrt((double)sum / estimations.size());
+        return Math.sqrt(sum / estimations.size());
     }
     
     /**
@@ -239,5 +243,54 @@ public class EstimationPool {
             pred.divide(estimationPools.size());
         }
         return res;
+    }
+    
+    @Deprecated
+    public static List<Predictor> gainingPercentageC(List<Predictor> preds){
+        List<Predictor> res = new ArrayList<>();
+        Predictor gauge = null;
+        int gaugeIndex = 0;
+        for(int i=0; i<preds.size(); i++){
+            if(preds.get(i).getName().equals(Const.algoNames[0])){
+                gauge = preds.get(i);
+                gaugeIndex = i;
+            }
+        }
+        for(int i=0; i<preds.size(); i++){ 
+            if(i != gaugeIndex){
+                Predictor pr = new Predictor(preds.get(i).getName());
+                for(int j=0; j<gauge.getEstimations().size(); j++){
+                    pr.addEstim(countGaining(gauge.getEstimations().get(j),
+                            preds.get(i).getEstimations().get(j)));
+                }
+                res.add(pr);
+            }
+        }
+        return res;
+    }
+    
+    public static Map<String, Double>gainingPercentage(List<Predictor> preds){
+        final short estNumber = 0;
+        Map<String, Double> res = new HashMap<>();
+//        Map<String, Double> res = new TreeMap<String, Double>(new PercentageComparator());
+        double gauge = 0.0;
+        int gaugeIndex = 0;
+        for(int i=0; i<preds.size(); i++){
+            if(preds.get(i).getName().equals(Const.algoNames[0])){
+                gauge = preds.get(i).getEstimations().get(estNumber);
+                gaugeIndex = i;
+            }
+        }
+        for(int i=0; i<preds.size(); i++){
+            if(i != gaugeIndex){
+                res.put(preds.get(i).getName(), 
+                        countGaining(gauge, preds.get(i).getEstimations().get(estNumber)));
+            }
+        }
+        return res;
+    }
+    
+    private static double countGaining(double gauge, double value){
+        return 100 * (gauge - value) / gauge;
     }
 }
