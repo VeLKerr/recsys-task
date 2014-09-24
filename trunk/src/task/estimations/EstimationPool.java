@@ -287,6 +287,7 @@ public class EstimationPool {
                         countGaining(gauge, preds.get(i).getEstimations().get(estNumber)));
             }
         }
+        //TODO: Отсортировать Map.
         return res;
     }
     
