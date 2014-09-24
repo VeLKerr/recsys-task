@@ -4,7 +4,7 @@ package task.estimations;
 import java.util.ArrayList;
 import java.util.List;
 import static task.estimations.EstimationPool.Const.symbolsAfterComma;
-import task.utils.Utils;
+import task.utils.MathUtils;
 
 /**
  * Класс, описывающий оценки работы предиктора.
@@ -43,7 +43,7 @@ public class Predictor implements Comparable<Predictor>{
     public String toString(){
         StringBuilder sb = new StringBuilder();
         for(double est: estimations){
-            sb.append(Utils.roundDouble(est, symbolsAfterComma)).append("\t");
+            sb.append(MathUtils.roundDouble(est, symbolsAfterComma)).append("\t");
         }
         sb.append("- ").append(name);
         return sb.toString();
@@ -61,8 +61,20 @@ public class Predictor implements Comparable<Predictor>{
             return 0;
         }
     }
+
+    public List<Double> getEstimations() {
+        return estimations;
+    }
+
+    public String getName() {
+        return name;
+    }
     
-    public void addPredictor(Predictor pred){
+    public int estimCount(){
+        return estimations.size();
+    }
+    
+    protected void addPredictor(Predictor pred){
         if(!this.name.equals(pred.name)){
             System.err.println("ERROR! Unable to calculate sum of the different types of predictors!");
         }
@@ -73,7 +85,7 @@ public class Predictor implements Comparable<Predictor>{
         }
     }
     
-    public void divide(int number){
+    protected void divide(int number){
         for(int i=0; i<estimations.size(); i++){
             estimations.set(i, estimations.get(i) / number);
         }

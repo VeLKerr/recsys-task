@@ -6,6 +6,7 @@
 
 package task;
 
+import task.utils.ConsoleUtils;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,9 +16,10 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import task.estimations.EstimationPool;
+import task.estimations.Predictor;
 import task.learning.GeneralAverageRating;
 import task.utils.FileNameBuilder;
-import task.utils.Utils;
+import task.utils.MathUtils;
 
 /**
  * Главный класс проограммы
@@ -64,31 +66,30 @@ public class Task {
             while((line = br.readLine()) != null){
                 sc = new Score(line);
                 est.createNewEmptyEstimationsRow();
-                est.setAverage(Utils.round(gav.avg())); //эта оценка практически не меняется, 
+                est.setAverage(gav.avg()); //эта оценка практически не меняется, 
                 //но я всё равно рассчитываю её каждый раз т.к. теоретически она
                 //измениться может.
-                est.setAverageOverItems(Utils.round(gav.avgOn(sc.getItemId(), false)));
-                est.setAverageOverUsers(Utils.round(gav.avgOn(sc.getUserId(), true)));
-                est.setAverageRandom(Utils.randomRating());
-                est.setBaselinePredictor(Utils.round(gav.countBaselinePredictor(
-                        sc.getUserId(), sc.getItemId())));
-                est.setBaselinePredictorWithBeta(Utils.round(gav.countBaselinePredictor(
-                        sc.getUserId(), sc.getItemId(), beta)));
+                est.setAverageOverItems(gav.avgOn(sc.getItemId(), false));
+                est.setAverageOverUsers(gav.avgOn(sc.getUserId(), true));
+                est.setAverageRandom(MathUtils.randomRating());
+                est.setBaselinePredictor(gav.countBaselinePredictor(
+                        sc.getUserId(), sc.getItemId()));
+                est.setBaselinePredictorWithBeta(gav.countBaselinePredictor(
+                        sc.getUserId(), sc.getItemId(), beta));
                 est.setTrueRating(sc.getRating());
-                gav.add(sc); //дообучение системы
+//                gav.add(sc); //дообучение системы
             }
-//            System.out.println(est.toString());
-            System.out.println("==========================================================================");
-            System.out.println("\t\t\tTest #" + i);
-            System.out.println("==========================================================================");
+            ConsoleUtils.outputResults(i);
             //вывод матрицы оценок погрешностей алгоритмов.
             System.out.println(est.estimatesToString());
 //            est.countEstimates();
+//            System.out.println(EstimationPool.listPredToString(est.getPredictors()));
             estimationPools.add(est);
         }
-        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        System.out.println("\t\tAVERAGE VALUES");
-        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        System.out.println(EstimationPool.listPredToString(EstimationPool.avg(estimationPools)));
+        ConsoleUtils.outputAverages();
+        List<Predictor> preds = EstimationPool.avg(estimationPools);
+        System.out.println(EstimationPool.listPredToString(preds));
+        ConsoleUtils.outputGaining();
+        ConsoleUtils.outputPercentageMap(EstimationPool.gainingPercentage(preds));
     }
 }

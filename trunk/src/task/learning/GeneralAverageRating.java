@@ -4,7 +4,7 @@ package task.learning;
 import java.util.ArrayList;
 import java.util.List;
 import task.Score;
-import task.utils.Utils;
+import task.utils.MathUtils;
 
 /**
  * Класс для хранения всевозможных суммарных оценок и кол-ва оценок.
@@ -81,7 +81,7 @@ public class GeneralAverageRating extends AverageRating{
                 return iou.avg();
             }
         }
-        return Utils.randomRating();
+        return MathUtils.randomRating();
     }
     
     /**
@@ -97,7 +97,7 @@ public class GeneralAverageRating extends AverageRating{
                 return iou.avg(beta);
             }
         }
-        return Utils.randomRating();
+        return MathUtils.randomRating();
     }
     
     private double countGeneralPart(double beta){
@@ -139,11 +139,11 @@ public class GeneralAverageRating extends AverageRating{
             }
         }
         if(!userFlag){
-            predictor += Utils.randomRating();
+            predictor += MathUtils.randomRating();
             ui = 1;
         }
         if(!itemFlag){
-            predictor += Utils.randomRating();
+            predictor += MathUtils.randomRating();
             iu = 1;
         }
         predictor += muMultiplier(ui, iu, beta) * avg();
