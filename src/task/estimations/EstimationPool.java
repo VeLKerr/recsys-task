@@ -1,13 +1,15 @@
 
 package task.estimations;
 
+import java.math.MathContext;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import task.utils.Utils;
 import static task.Task.beta;
 
 /**
- * Singleton-класс для храниения спрогнозированных оценок и эталонной оценки пользователя.
+ * Класс для храниения спрогнозированных оценок и эталонной оценки пользователя.
  * Оценки записываются в виде матрицы, в которой строкам соответствуют оценки
  * user-item, а столбцы соответствуют применённом алгоритму:
  * <ul>
@@ -34,40 +36,38 @@ public class EstimationPool {
         /**
          * Кол-во символов после запятой при округлении десятичных дробей.
          */
-        private static final int symbolsAfterComma = 5;
+        public static final int symbolsAfterComma = 5;
         /**
          * Кол-во использованных алгоритмов.
          */
         private static final int algoCnt = 6;
-        /**
-         * Кол-во использованных оценок.
-         */
-        private static final int estCnt = 4;
+        private static final String[] algoNames = {
+            "average values",
+            "average over the items",
+            "average over the users",
+            "random rating",
+            "baseline predictor",
+            "baseline predictor with BETA=" + beta
+        };
     }
-    /**
-     * Instance для Singleton-класса.
-     */
-    private static EstimationPool instance;
     /**
      * Матрица прогнозов оценок, рассчитанных с помощью разных алгоритмов.
      */
     private final List<List<Integer>> estimations;
-
-    private EstimationPool() {
-        this.estimations = new ArrayList<>();
-    }
+    /**
+     * Оценки алгоритмов.
+     */
+    private final List<Predictor> predictors;
     
-    public static EstimationPool getEstimationPool(){
-        if(instance == null){
-            instance = new EstimationPool();
-        }
-        return instance;
+    public EstimationPool() {
+        this.estimations = new ArrayList<>();
+        this.predictors = new ArrayList<>();
     }
     
     /**
      * Создать новую строку в матрице оценок.
      */
-    public void createNewEmptyEstimation(){
+    public void createNewEmptyEstimationsRow(){
         this.estimations.add(new ArrayList<Integer>());
     }
     
@@ -187,63 +187,57 @@ public class EstimationPool {
      * </ul>
      * @return матрица оценок.
      */
-    public List<List<Double>> countEstimations(){
-        List<List<Double>> algoEst = new ArrayList<>();
+    public void countEstimates(){
         for(int i=1; i<Const.algoCnt + 1; i++){
-            List<Double> estim = new ArrayList<>();
+            Predictor pred = new Predictor(Const.algoNames[i-1]);
             double mae = countMAE(i);
             double rmse = countRMSE(i);
             int diff = Const.highest - Const.lowest;
-            estim.add(mae);
-            estim.add(mae / diff);
-            estim.add(rmse);
-            estim.add(rmse / diff);
-            algoEst.add(estim);
+            pred.addEstim(mae);
+            pred.addEstim(mae / diff);
+            pred.addEstim(rmse);
+            pred.addEstim(rmse / diff);
+            predictors.add(pred);
         }
-        return algoEst;
+        Collections.sort(predictors);
     }
     
     /**
      * Перевод матрицы оценок в строку.
-     * @param estimates матрица оценок.
      * @return строковое представление матрицы оценок.
+     * @deprecated 
      */
-    public String estimatesToString(List<List<Double>> estimates){
+    public String estimatesToString(){
+        countEstimates();
+        return listPredToString(predictors);
+    }
+    
+    public static String listPredToString(List<Predictor> preds){
         StringBuilder sb = new StringBuilder("MAE \t NMAE \t RMSE \t NRMSE\n");
-        for(int i=0; i<Const.algoCnt; i++){
-            for(double est: estimates.get(i)){
-                sb.append(Utils.roundDouble(est, Const.symbolsAfterComma));
-                sb.append("\t");
-            }
-            switch(i){
-                case 0:{
-                    sb.append("- average values");
-                    break;
-                }
-                case 1:{
-                    sb.append("- average over the items");
-                    break;
-                }
-                case 2:{
-                    sb.append("- average over the users");
-                    break;
-                }
-                case 3:{
-                    sb.append("- random rating");
-                    break;
-                }
-                case 4:{
-                    sb.append("- baseline predictor");
-                    break;
-                }
-                case 5:{
-                    sb.append("- baseline predictor with BETA=");
-                    sb.append(beta);
-                    break;
-                }
-            }
-            sb.append("\n");
+        for(Predictor pred: preds){
+            sb.append(pred.toString()).append("\n");
         }
         return sb.toString();
+    }
+    
+    /**
+     * Получить список оценок предикторов.
+     * @return список оценок предикторов.
+     */
+    public List<Predictor> getPredictors(){
+        return predictors;
+    }
+    
+    public static List<Predictor> avg(List<EstimationPool> estimationPools){
+        List<Predictor> res = estimationPools.get(0).predictors;
+        for(EstimationPool est: estimationPools.subList(1, estimationPools.size())){
+            for(int j=0; j<res.size(); j++){
+                res.get(j).addPredictor(est.predictors.get(j));
+            }
+        }
+        for(Predictor pred: res){
+            pred.divide(estimationPools.size());
+        }
+        return res;
     }
 }
