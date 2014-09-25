@@ -2,10 +2,19 @@
 package task.estimations;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
 import static task.Task.beta;
 
 /**
@@ -271,8 +280,7 @@ public class EstimationPool {
     
     public static Map<String, Double>gainingPercentage(List<Predictor> preds){
         final short estNumber = 0;
-        Map<String, Double> res = new HashMap<>();
-//        Map<String, Double> res = new TreeMap<String, Double>(new PercentageComparator());
+        Map<String, Double> res = new LinkedHashMap<>();
         double gauge = 0.0;
         int gaugeIndex = 0;
         for(int i=0; i<preds.size(); i++){
@@ -287,7 +295,12 @@ public class EstimationPool {
                         countGaining(gauge, preds.get(i).getEstimations().get(estNumber)));
             }
         }
-        //TODO: Отсортировать Map.
+        List<Entry<String, Double>> entries = new LinkedList<>(res.entrySet());
+        Collections.sort(entries, new PercentageComparator());
+        res.clear();
+        for(Entry<String, Double> entry: entries){
+            res.put(entry.getKey(), entry.getValue());
+        }
         return res;
     }
     
