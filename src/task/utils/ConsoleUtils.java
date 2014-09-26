@@ -1,6 +1,7 @@
 
 package task.utils;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import task.estimations.EstimationPool;
@@ -44,5 +45,13 @@ public class ConsoleUtils {
             System.out.println(MathUtils.roundDouble(entry.getValue(), 
                     EstimationPool.Const.symbolsAfterComma + 1) + "%\t- " + entry.getKey());
         }
+    }
+    
+    public static StringBuilder listIntegersToString(List<Integer> list){
+        StringBuilder sb = new StringBuilder();
+        for(int value: list){
+            sb.append(value).append(", ");
+        }
+        return sb;
     }
 }
