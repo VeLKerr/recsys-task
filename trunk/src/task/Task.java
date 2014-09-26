@@ -18,6 +18,7 @@ import java.util.List;
 import task.estimations.EstimationPool;
 import task.estimations.Predictor;
 import task.learning.GeneralAverageRating;
+import task.learning.Users;
 import task.utils.FileNameBuilder;
 import task.utils.MathUtils;
 
@@ -39,11 +40,21 @@ public class Task {
      * Коэффициент затухания Бета.
      */
     public static final double beta = Math.pow(10, 6);
+    
+    private static void fillUsers(String filename) throws FileNotFoundException, IOException{
+        Users users = Users.getInstance();
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(path + filename)));
+        String line = null;
+        while((line = br.readLine()) != null){
+            users.add(line);
+        }
+    }
 
     /**
-     * @param args the command line arguments
+     * Главная функция программы
      */
     public static void main(String[] args) throws FileNotFoundException, IOException {
+        fillUsers("u.user");
         List<EstimationPool> estimationPools = new ArrayList<>();
         FileNameBuilder fnb = FileNameBuilder.getBuilder();
         String line = null;
@@ -91,5 +102,6 @@ public class Task {
         System.out.println(EstimationPool.listPredToString(preds));
         ConsoleUtils.outputGaining();
         ConsoleUtils.outputPercentageMap(EstimationPool.gainingPercentage(preds));
+        System.out.println(Users.getInstance().toString());
     }
 }
