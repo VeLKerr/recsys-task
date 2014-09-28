@@ -49,7 +49,7 @@ public class EstimationPool {
         /**
          * Кол-во использованных алгоритмов.
          */
-        private static final int algoCnt = 6;
+        private static final int algoCnt = 7;
         /**
          * Названия предикторов. Для корректной работы программы, название
          * эталонного предиктора должно иметь индекс <code>0</code>.
@@ -60,7 +60,8 @@ public class EstimationPool {
             "average over the users",
             "random rating",
             "baseline predictor",
-            "baseline predictor with BETA=" + beta
+            "baseline predictor with BETA=" + beta,
+            "average on gender"
         };
     }
     /**
@@ -127,12 +128,16 @@ public class EstimationPool {
         setEstimation(5, rating);
     }
     
+    public void setAvgOnGender(double rating){
+        setEstimation(6, rating);
+    }
+    
     /**
      * Сохранить эталонную оценку пользователем этого item'a.
      * @param rating значение оценки.
      */
     public void setTrueRating(double rating){
-        setEstimation(Const.algoCnt, rating);
+        setEstimation(Const.algoNames.length, rating);
     }
     
     /**
@@ -170,7 +175,7 @@ public class EstimationPool {
     }
     
     private double countDiff(List<Double> est, int algoType){
-        return est.get(algoType - 1) - est.get(Const.algoCnt);
+        return est.get(algoType - 1) - est.get(Const.algoNames.length);
     }
     
     private double countMAE(int algoType){
@@ -198,10 +203,9 @@ public class EstimationPool {
      *  <li>root mean squared error,</li>
      *  <li>normalized root mean squared error.</li>
      * </ul>
-     * @return матрица оценок.
      */
     public void countEstimates(){
-        for(int i=1; i<Const.algoCnt + 1; i++){
+        for(int i=1; i<Const.algoNames.length + 1; i++){
             Predictor pred = new Predictor(Const.algoNames[i-1]);
             double mae = countMAE(i);
             double rmse = countRMSE(i);

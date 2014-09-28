@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package task;
 
 import task.utils.ConsoleUtils;
@@ -80,13 +74,15 @@ public class Task {
                 est.setAverage(gav.avg()); //эта оценка практически не меняется, 
                 //но я всё равно рассчитываю её каждый раз т.к. теоретически она
                 //измениться может.
-                est.setAverageOverItems(gav.avgOn(sc.getItemId(), false));
+                est.setAverageOverItems(gav.avgOn(sc.getItemId(), false)); //среднее по всем
+                //item'ам для данного пользователя.
                 est.setAverageOverUsers(gav.avgOn(sc.getUserId(), true));
                 est.setAverageRandom(MathUtils.randomRating());
                 est.setBaselinePredictor(gav.countBaselinePredictor(
                         sc.getUserId(), sc.getItemId()));
                 est.setBaselinePredictorWithBeta(gav.countBaselinePredictor(
                         sc.getUserId(), sc.getItemId(), beta));
+                est.setAvgOnGender(gav.avgOnGender(sc.getUserId()));
                 est.setTrueRating(sc.getRating());
 //                gav.add(sc); //дообучение системы
             }
@@ -102,6 +98,5 @@ public class Task {
         System.out.println(EstimationPool.listPredToString(preds));
         ConsoleUtils.outputGaining();
         ConsoleUtils.outputPercentageMap(EstimationPool.gainingPercentage(preds));
-        System.out.println(Users.getInstance().toString());
     }
 }
