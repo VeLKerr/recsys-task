@@ -13,7 +13,7 @@ public class AverageRating {
     /**
      * Суммарная оценка.
      */
-    protected int sum;
+    protected double sum;
     /**
      * Счётчик оценок.
      */
@@ -29,7 +29,7 @@ public class AverageRating {
      * счётчик.
      * @param rating значение оценки.
      */
-    protected void add(int rating){
+    protected void add(double rating){
         cnt++;
         sum += rating;
     }

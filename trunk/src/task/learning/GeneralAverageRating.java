@@ -43,6 +43,7 @@ public class GeneralAverageRating extends AverageRating{
         add(score.getRating());
         boolean itemFlag = false;
         boolean userFlag = false;
+        int userItemAddingCnt = 0;
         for(ItemOrUser iou: ious){
             if(score.getItemId() == iou.getId() && !iou.isUser()){
                 iou.add(score.getRating());
@@ -50,7 +51,10 @@ public class GeneralAverageRating extends AverageRating{
             }
             if(score.getUserId() == iou.getId() && iou.isUser()){
                 iou.add(score.getRating());
-                userFlag = true;
+                userItemAddingCnt++;
+                if(userItemAddingCnt == 2){
+                    userFlag = true;
+                }                
             }
             if(itemFlag && userFlag){
                 break;
@@ -60,12 +64,16 @@ public class GeneralAverageRating extends AverageRating{
             ItemOrUser it = new ItemOrUser(score.getItemId(), false);
             it.add(score.getRating());
             ious.add(it);
-
         }
-        if(!userFlag){
+        if(!userFlag){ //TODO: РАСПАРАЛЛЕЛИТЬ!!!!
             ItemOrUser us = new ItemOrUser(score.getUserId(), true);
-            us.add(score.getRating());
+            ItemOrUser genderedUs = new ItemOrUser(score.getUserId(), true,
+                Users.getInstance().getGender(score.getUserId()));
+            int rating = score.getRating();
+            us.add(rating);
+            genderedUs.add(rating);
             ious.add(us);
+            ious.add(genderedUs);
         }
     }
     
@@ -84,27 +92,43 @@ public class GeneralAverageRating extends AverageRating{
         return MathUtils.randomRating();
     }
     
-    /**
-     * Рассчитать среднюю оценку.
-     * @param id пользователя или item'a.
-     * @param isUser флаг, указывающий на то, пользователь это или item.
-     * @param beta коэффициент затухания Бета.
-     * @return среднюю оценку.
-     */
-    private double avgOn(int id, boolean isUser, double beta){
-        for(ItemOrUser iou: ious){
-            if(iou.getId() == id && iou.isUser() == isUser){
-                return iou.avg(beta);
+    public double avgOnItemsWithGender(int id, boolean gender){
+        for(ItemOrUser iou:ious){
+            if(iou.getId() == id && iou.isUser() && iou.getGender() == gender){
+                return iou.avg();
             }
         }
         return MathUtils.randomRating();
     }
     
-    private double countGeneralPart(double beta){
+    public double avgOnGender(int id){
+        boolean gender = Users.getInstance().getGender(id);
+        AverageRating ar = new AverageRating();
+        for(ItemOrUser iou: ious){
+            if(iou.isUser() && iou.getGender() == gender && iou.getId() == id){
+                ar.add(iou.avg());
+            }
+        }
+        return ar.avg();
+    }
+    
+    /**
+     * Рассчитать общую часть базового предиктора.
+     * @param beta коэффициент затухания.
+     * @param genderVals переменные касающиеся пола пользователей:
+     * <ol>
+     *  <li>учитывать ли пол пользователя,</li>
+     *  <li>значение пола (мужчина - <code>true</code>).</li>
+     * </ol>
+     * @return 
+     */
+    private double countGeneralPart(double beta, boolean... genderVals){
         double UserSum = 0.0;
         int userCnt = 0;
         for(ItemOrUser iou: ious){
-            if(iou.isUser()){
+            if(iou.isUser() &&
+               ((!genderVals[0] && iou.isNoGender()) ||
+                (genderVals[1]) && iou.getGender() == genderVals[1])){
                 UserSum += iou.avg(beta);
                 userCnt++;
             }
@@ -114,11 +138,11 @@ public class GeneralAverageRating extends AverageRating{
     
     public double countBaselinePredictor(int userId, int itemId){
         return avgOn(userId, true) + avgOn(itemId, false) - 
-               countGeneralPart(0.0);
+               countGeneralPart(0.0, false, false);
     }
     
     public double countBaselinePredictor(int userId, int itemId, double beta){
-        double predictor = countGeneralPart(beta);
+        double predictor = countGeneralPart(beta, false, false);
         int ui = 0;
         int iu = 0;
         //Флаги указывают на то, нашёлся ли в обучающей выборке такой 
@@ -165,7 +189,7 @@ public class GeneralAverageRating extends AverageRating{
      * @return сумма всех оценок, присутствующих в хранилище.
      */
     public int getSum() {
-        return sum;
+        return MathUtils.round(sum);
     }
     
     /**

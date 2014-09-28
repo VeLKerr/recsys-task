@@ -18,11 +18,9 @@ public class Users {
      * Объект для парсинга строк
      */
     private static StringTokenizer st;
-    private final List<Integer> men;
-    private final List<Integer> women;
+    private final List<Integer> women; //женщин в выборке меньше, с ними и работаем
     
     private Users(){
-        this.men = new ArrayList<>();
         this.women = new ArrayList<>();
     }
     
@@ -37,35 +35,23 @@ public class Users {
         st = new StringTokenizer(line, delim);
         int userId = Integer.parseInt(st.nextToken());
         st.nextToken();
-        if(st.nextToken().contains("M")){
-            men.add(userId);
-        }
-        else{
+        if(st.nextToken().contains("F")){
             women.add(userId);
         }
     }
     
-    public boolean isMen(int userId){
-        for(int usId: women){ //женщин в выборке меньше, по ним и проходим
-            if(usId == userId){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public List<Integer> getMen() {
-        return men;
+    public boolean getGender(int userId){
+        return !women.contains(userId);
     }
 
     public List<Integer> getWomen() {
         return women;
     }
     
+    @Override
     public String toString(){
-        StringBuilder sb = new StringBuilder("Men: ");
-        sb.append(ConsoleUtils.listIntegersToString(men));
-        sb.append("\nWomen: ");
+        StringBuilder sb = new StringBuilder();
+        sb.append("Women: ");
         sb.append(ConsoleUtils.listIntegersToString(women));
         return sb.toString();
     }
