@@ -41,8 +41,6 @@ public class Debug {
         }
         System.out.println(lineCnt);
         System.out.println(gav._size());
-        System.out.println(gav._check());
-        gav._check();
         System.out.println(us.size());
     }
     
