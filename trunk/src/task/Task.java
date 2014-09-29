@@ -82,7 +82,8 @@ public class Task {
                         sc.getUserId(), sc.getItemId()));
                 est.setBaselinePredictorWithBeta(gav.countBaselinePredictor(
                         sc.getUserId(), sc.getItemId(), beta));
-                est.setAvgOnGender(gav.avgOnGender(sc.getUserId()));
+                est.setAvgOnGender(gav.avgOn(sc.getGender()));
+                est.setAvgOnUsersWithGender(gav.avgOnUsersWithGender(sc.getUserId(), sc.getGender()));
                 est.setTrueRating(sc.getRating());
 //                gav.add(sc); //дообучение системы
             }

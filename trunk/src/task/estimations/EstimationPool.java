@@ -2,19 +2,12 @@
 package task.estimations;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
 import static task.Task.beta;
 
 /**
@@ -47,10 +40,6 @@ public class EstimationPool {
          */
         public static final int symbolsAfterComma = 5;
         /**
-         * Кол-во использованных алгоритмов.
-         */
-        private static final int algoCnt = 7;
-        /**
          * Названия предикторов. Для корректной работы программы, название
          * эталонного предиктора должно иметь индекс <code>0</code>.
          */
@@ -61,7 +50,8 @@ public class EstimationPool {
             "random rating",
             "baseline predictor",
             "baseline predictor with BETA=" + beta,
-            "average on gender"
+            "average on gender",
+            "average over the users with the same gender"
         };
     }
     /**
@@ -130,6 +120,10 @@ public class EstimationPool {
     
     public void setAvgOnGender(double rating){
         setEstimation(6, rating);
+    }
+    
+    public void setAvgOnUsersWithGender(double rating){
+        setEstimation(7, rating);
     }
     
     /**
@@ -216,7 +210,7 @@ public class EstimationPool {
             pred.addEstim(rmse / diff);
             predictors.add(pred);
         }
-        Collections.sort(predictors);
+        //Collections.sort(predictors);
     }
     
     /**
@@ -230,8 +224,18 @@ public class EstimationPool {
     }
     
     public static String listPredToString(List<Predictor> preds){
-        StringBuilder sb = new StringBuilder("MAE \t NMAE \t RMSE \t NRMSE\n");
+        List<Predictor> prS = new ArrayList<>();
         for(Predictor pred: preds){
+            try{
+                prS.add(pred.clone());
+            }
+            catch(CloneNotSupportedException cnse){
+                cnse.printStackTrace();
+            }
+        }
+        Collections.sort(prS);
+        StringBuilder sb = new StringBuilder("MAE \t NMAE \t RMSE \t NRMSE\n");
+        for(Predictor pred: prS){
             sb.append(pred.toString()).append("\n");
         }
         return sb.toString();
@@ -245,6 +249,11 @@ public class EstimationPool {
         return predictors;
     }
     
+    /**
+     * Рассчёт средних значений по всем прогонам
+     * @param estimationPools оценки по всем прогонам.
+     * @return сводная таблица средних значений.
+     */
     public static List<Predictor> avg(List<EstimationPool> estimationPools){
         List<Predictor> res = estimationPools.get(0).predictors;
         for(EstimationPool est: estimationPools.subList(1, estimationPools.size())){

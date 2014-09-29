@@ -1,6 +1,8 @@
 
 package task.learning;
 
+import task.utils.MathUtils;
+
 /**
  * Класс для хранения данных для рассчёта средних оценок.
  * Среднее арифметическое рассчитывается как сумма чисел, делённая на их кол-во.
@@ -39,7 +41,13 @@ public class AverageRating {
      * @return среднее значение оценок.
      */
     public double avg(){
-        return (double) sum / (double)cnt;
+        double avg = sum / cnt;
+        return avg;
+        //UNCOMMENT WHEN BUGS WILL FIXED!
+//        if(Double.isFinite(avg)){
+//            return avg;
+//        }
+//        return (double)MathUtils.randomRating();
     }
     
     /**

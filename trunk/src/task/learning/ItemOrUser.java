@@ -17,14 +17,14 @@ public class ItemOrUser extends AverageRating{
      */
     private final int id;
     /**
-     * этот объект содержит суммарную оценку по пользователю или item'у?
+     * Суммарная оценка по item'ам даного пользователя.
      */
     private final boolean isUser;
     /**
      * Пол. 1 - без распределения, 
      * 2 - мужской, 3 - женский.
      */
-    private int gender;
+    private final int gender;
     
     public ItemOrUser(int id, boolean isUser) {
         super();
@@ -44,7 +44,6 @@ public class ItemOrUser extends AverageRating{
         }
     }
     
-    
     /**
      * Получить id item'а или пользователя.
      * @return id item'а или пользователя.
@@ -62,7 +61,10 @@ public class ItemOrUser extends AverageRating{
         return isUser;
     }
     
-    public boolean getGender(){
+    public boolean getGender(){ //TODO: To throw the NoGenderException!
+        if(isUser){
+            System.err.println("This object hesn\'t gender!");
+        }
         return gender == 2;
     }
     
