@@ -43,37 +43,36 @@ public class GeneralAverageRating extends AverageRating{
         add(score.getRating());
         boolean itemFlag = false;
         boolean userFlag = false;
-        int userItemAddingCnt = 0;
+        int itemAddingCnt = 0;
         for(ItemOrUser iou: ious){
             if(score.getItemId() == iou.getId() && !iou.isUser()){
                 iou.add(score.getRating());
-                itemFlag = true;
+                itemAddingCnt++;
+                if(itemAddingCnt == 2){
+                    itemFlag = true;
+                }
             }
             if(score.getUserId() == iou.getId() && iou.isUser()){
                 iou.add(score.getRating());
-                userItemAddingCnt++;
-                if(userItemAddingCnt == 2){
-                    userFlag = true;
-                }                
+                userFlag = true;
             }
             if(itemFlag && userFlag){
                 break;
             }
         }
-        if(!itemFlag){
+        if(!itemFlag){ //TODO: РАСПАРАЛЛЕЛИТЬ!!!!
             ItemOrUser it = new ItemOrUser(score.getItemId(), false);
-            it.add(score.getRating());
-            ious.add(it);
-        }
-        if(!userFlag){ //TODO: РАСПАРАЛЛЕЛИТЬ!!!!
-            ItemOrUser us = new ItemOrUser(score.getUserId(), true);
-            ItemOrUser genderedUs = new ItemOrUser(score.getUserId(), true,
-                Users.getInstance().getGender(score.getUserId()));
+            ItemOrUser genderedIt = new ItemOrUser(score.getItemId(), false, score.getGender());
             int rating = score.getRating();
-            us.add(rating);
-            genderedUs.add(rating);
+            it.add(rating);
+            genderedIt.add(rating);
+            ious.add(it);
+            ious.add(genderedIt);
+        }
+        if(!userFlag){ 
+            ItemOrUser us = new ItemOrUser(score.getUserId(), true);
+            us.add(score.getRating());
             ious.add(us);
-            ious.add(genderedUs);
         }
     }
     
@@ -85,31 +84,42 @@ public class GeneralAverageRating extends AverageRating{
      */
     public double avgOn(int id, boolean isUser){
         for(ItemOrUser iou: ious){
-            if(iou.getId() == id && iou.isUser() == isUser){
+            if(iou.getId() == id && iou.isUser() == isUser && iou.isNoGender()){
                 return iou.avg();
             }
         }
         return MathUtils.randomRating();
     }
     
-    public double avgOnItemsWithGender(int id, boolean gender){
+    public double avgOnUsersWithGender(int itemId, boolean gender){
         for(ItemOrUser iou:ious){
-            if(iou.getId() == id && iou.isUser() && iou.getGender() == gender){
+            if(iou.getId() == itemId && !iou.isUser() && iou.getGender() == gender){
                 return iou.avg();
             }
         }
         return MathUtils.randomRating();
     }
     
-    public double avgOnGender(int id){
-        boolean gender = Users.getInstance().getGender(id);
+    public double avgOnGender(int userId, boolean gender){
+        for(ItemOrUser iou: ious){
+            if(!iou.isUser() && iou.getGender() == gender && iou.getId() == userId){
+                return iou.avg();
+            }
+        }
+        return MathUtils.randomRating();
+    }
+    
+    public double avgOn(boolean gender){
         AverageRating ar = new AverageRating();
         for(ItemOrUser iou: ious){
-            if(iou.isUser() && iou.getGender() == gender && iou.getId() == id){
+//            if(!iou.isUser() && iou.getGender() == gender){
+//                ar.add(iou.avg());
+//            }
+            if(iou.isUser() && Users.getInstance().getGender(iou.getId()) == gender){
                 ar.add(iou.avg());
             }
         }
-        return ar.avg();
+        return MathUtils.randomRating();
     }
     
     /**
@@ -123,17 +133,15 @@ public class GeneralAverageRating extends AverageRating{
      * @return 
      */
     private double countGeneralPart(double beta, boolean... genderVals){
-        double UserSum = 0.0;
+        double userSum = 0.0;
         int userCnt = 0;
         for(ItemOrUser iou: ious){
-            if(iou.isUser() &&
-               ((!genderVals[0] && iou.isNoGender()) ||
-                (genderVals[1]) && iou.getGender() == genderVals[1])){
-                UserSum += iou.avg(beta);
+            if(iou.isUser()){
+                userSum += iou.avg(beta);
                 userCnt++;
             }
         }
-        return UserSum / userCnt;
+        return userSum / userCnt;
     }
     
     public double countBaselinePredictor(int userId, int itemId){

@@ -2,6 +2,7 @@ package task;
 
 import java.util.List;
 import java.util.StringTokenizer;
+import task.learning.Users;
 
 /**
  * Класс пользовательских оценок (объект - распознанная строка файла u.data 
@@ -16,6 +17,7 @@ public class Score implements Comparable<Score>{
     
     private final int userId;
     private final int itemId;
+    private final boolean gender;
     private int rating;
     private long timestamp;
     
@@ -29,13 +31,7 @@ public class Score implements Comparable<Score>{
         itemId = Integer.parseInt(st.nextToken());
         rating = Integer.parseInt(st.nextToken());
         timestamp = Long.parseLong(st.nextToken());
-    }
-    
-    public Score(int user_id, int item_id, int estimate, long timestamp) {
-        this.userId = user_id;
-        this.itemId = item_id;
-        this.rating = estimate;
-        this.timestamp = timestamp;
+        gender = Users.getInstance().getGender(userId);
     }
 
     public int getUserId() {
@@ -133,5 +129,8 @@ public class Score implements Comparable<Score>{
         }
         return true;
     }
-    
+
+    public boolean getGender() {
+        return gender;
+    }
 }

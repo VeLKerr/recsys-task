@@ -10,7 +10,7 @@ import task.utils.MathUtils;
  * Класс, описывающий оценки работы предиктора.
  * @author Ivchenko Oleg (Kirius VeLKerr)
  */
-public class Predictor implements Comparable<Predictor>{
+public class Predictor implements Comparable<Predictor>, Cloneable{
     /**
      * Оценки работы предиктора:
      * <ul>
@@ -20,14 +20,19 @@ public class Predictor implements Comparable<Predictor>{
      *  <li>NRMSE.</li>
      * </ul>
      */
-    private final List<Double> estimations;
+    private List<Double> estimations;
     /**
      * Название предиктора.
      */
-    private final String name;
+    private String name;
     
     public Predictor(String name){
         this.estimations = new ArrayList<>();
+        this.name = name;
+    }
+    
+    private Predictor(String name, List<Double> estimations){
+        this.estimations = estimations;
         this.name = name;
     }
     
@@ -70,10 +75,6 @@ public class Predictor implements Comparable<Predictor>{
         return name;
     }
     
-    public int estimCount(){
-        return estimations.size();
-    }
-    
     protected void addPredictor(Predictor pred){
         if(!this.name.equals(pred.name)){
             System.err.println("ERROR! Unable to calculate sum of the different types of predictors!");
@@ -89,5 +90,17 @@ public class Predictor implements Comparable<Predictor>{
         for(int i=0; i<estimations.size(); i++){
             estimations.set(i, estimations.get(i) / number);
         }
+    }
+    
+    @Override
+    public Predictor clone() throws CloneNotSupportedException{
+        List<Double> newEstimations = new ArrayList<>(estimations.size());
+        for(double est: estimations){
+            newEstimations.add(est);
+        }
+        Predictor res = (Predictor)super.clone();
+        res.name = new String(this.name);
+        res.estimations = newEstimations;
+        return res;
     }
 }
