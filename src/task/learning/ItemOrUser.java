@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package task.learning;
 
 /**
@@ -26,6 +20,18 @@ public class ItemOrUser extends AverageRating{
      */
     private final int gender;
     
+    protected ItemOrUser(boolean gender){
+        super();
+        if(gender){
+            this.gender = 2;
+        }
+        else{
+            this.gender = 3;
+        }
+        this.id = 0;
+        this.isUser = false;
+    }
+    
     public ItemOrUser(int id, boolean isUser) {
         super();
         this.id = id;
@@ -33,7 +39,8 @@ public class ItemOrUser extends AverageRating{
         this.gender = 1;
     }
 
-    public ItemOrUser(int id, boolean isUser, boolean gender) {
+    protected ItemOrUser(int id, boolean isUser, boolean gender) {
+        super();
         this.id = id;
         this.isUser = isUser;
         if(gender){

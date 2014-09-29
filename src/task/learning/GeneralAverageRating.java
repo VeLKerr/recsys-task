@@ -12,10 +12,6 @@ import task.utils.MathUtils;
  */
 public class GeneralAverageRating extends AverageRating{
     /**
-     * Instance для Singleton-класса.
-     */
-    private static GeneralAverageRating instance;
-    /**
      * Коллекция объектов, сдержащих суммарные оценки и их кол-во:
      * <ul>
      *  <li>по каждому item'у,</li>
@@ -23,10 +19,18 @@ public class GeneralAverageRating extends AverageRating{
      * </ul>
      */
     private final List<ItemOrUser> ious;
+    private final ItemOrUser[] general;
 
     public GeneralAverageRating() {
         super();
         this.ious = new ArrayList<>();
+        this.general = new ItemOrUser[2];
+        createGenderDependentIous();
+    }
+    
+    private void createGenderDependentIous(){
+        general[0] = new ItemOrUser(true);
+        general[1] = new ItemOrUser(false);
     }
     
     /**
@@ -41,6 +45,7 @@ public class GeneralAverageRating extends AverageRating{
      */
     public void add(Score score){
         add(score.getRating());
+        general[genderToIntLocal(score.getGender())].add(score.getRating());
         boolean itemFlag = false;
         boolean userFlag = false;
         int itemAddingCnt = 0;
@@ -100,26 +105,12 @@ public class GeneralAverageRating extends AverageRating{
         return MathUtils.randomRating();
     }
     
-    public double avgOnGender(int userId, boolean gender){
-        for(ItemOrUser iou: ious){
-            if(!iou.isUser() && iou.getGender() == gender && iou.getId() == userId){
-                return iou.avg();
-            }
-        }
-        return MathUtils.randomRating();
-    }
-    
     public double avgOn(boolean gender){
-        AverageRating ar = new AverageRating();
-        for(ItemOrUser iou: ious){
-//            if(!iou.isUser() && iou.getGender() == gender){
-//                ar.add(iou.avg());
-//            }
-            if(iou.isUser() && Users.getInstance().getGender(iou.getId()) == gender){
-                ar.add(iou.avg());
-            }
+        double avg = general[genderToIntLocal(gender)].avg();
+        if(Double.isNaN(avg)){
+            return MathUtils.randomRating();
         }
-        return MathUtils.randomRating();
+        return avg;
     }
     
     /**
@@ -209,28 +200,22 @@ public class GeneralAverageRating extends AverageRating{
     }
     
     /**
-     * Для тестирования. 
-     * @return 
+     * Перевод булевкой переменной, обзначающей пол в числовую форму.
+     * @param gender пол.
+     * @return числовое представление пола.
      */
-    public int _size(){
-        return ious.size();
+    private static int genderToIntLocal(boolean gender){
+        if(gender){
+            return 0;
+        }
+        return 1;
     }
     
     /**
      * Для тестирования. 
      * @return 
      */
-    public boolean _check(){
-        for(int i=0; i<ious.size(); i++){
-            for(int j=0; j<ious.size(); j++){
-                if(i != j && 
-                   ious.get(i).getId() == ious.get(j).getId() &&
-                   ious.get(i).isUser() == ious.get(j).isUser()){
-                    System.out.println(i + " " + j);
-                    return false;
-                }
-            }
-        }
-        return true;
+    public int _size(){
+        return ious.size();
     }
 }
