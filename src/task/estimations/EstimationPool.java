@@ -30,29 +30,9 @@ public class EstimationPool {
      */
     public static abstract class Const{
         /**
-         * Границы шкалы пользовательских оценок.
-         */
-        public static final int highest = 5;
-        public static final int lowest = 1;
-        
-        /**
          * Кол-во символов после запятой при округлении десятичных дробей.
          */
         public static final int symbolsAfterComma = 5;
-        /**
-         * Названия предикторов. Для корректной работы программы, название
-         * эталонного предиктора должно иметь индекс <code>0</code>.
-         */
-        private static final String[] algoNames = {
-            "average values",
-            "average over the items",
-            "average over the users",
-            "random rating",
-            "baseline predictor",
-            "baseline predictor with BETA=" + beta,
-            "average on gender",
-            "average over the users with the same gender"
-        };
     }
     /**
      * Матрица прогнозов оценок, рассчитанных с помощью разных алгоритмов.
@@ -131,7 +111,7 @@ public class EstimationPool {
      * @param rating значение оценки.
      */
     public void setTrueRating(double rating){
-        setEstimation(Const.algoNames.length, rating);
+        setEstimation(Consts.algoNames.length, rating);
     }
     
     /**
@@ -169,7 +149,7 @@ public class EstimationPool {
     }
     
     private double countDiff(List<Double> est, int algoType){
-        return est.get(algoType - 1) - est.get(Const.algoNames.length);
+        return est.get(algoType - 1) - est.get(Consts.algoNames.length);
     }
     
     private double countMAE(int algoType){
@@ -199,11 +179,11 @@ public class EstimationPool {
      * </ul>
      */
     public void countEstimates(){
-        for(int i=1; i<Const.algoNames.length + 1; i++){
-            Predictor pred = new Predictor(Const.algoNames[i-1]);
+        for(int i=1; i<Consts.algoNames.length + 1; i++){
+            Predictor pred = new Predictor(Consts.algoNames[i-1]);
             double mae = countMAE(i);
             double rmse = countRMSE(i);
-            int diff = Const.highest - Const.lowest;
+            int diff = Consts.highest - Consts.lowest;
             pred.addEstim(mae);
             pred.addEstim(mae / diff);
             pred.addEstim(rmse);
@@ -273,7 +253,7 @@ public class EstimationPool {
         Predictor gauge = null;
         int gaugeIndex = 0;
         for(int i=0; i<preds.size(); i++){
-            if(preds.get(i).getName().equals(Const.algoNames[0])){
+            if(preds.get(i).getName().equals(Consts.algoNames[0])){
                 gauge = preds.get(i);
                 gaugeIndex = i;
             }
@@ -297,7 +277,7 @@ public class EstimationPool {
         double gauge = 0.0;
         int gaugeIndex = 0;
         for(int i=0; i<preds.size(); i++){
-            if(preds.get(i).getName().equals(Const.algoNames[0])){
+            if(preds.get(i).getName().equals(Consts.algoNames[0])){
                 gauge = preds.get(i).getEstimations().get(estNumber);
                 gaugeIndex = i;
             }

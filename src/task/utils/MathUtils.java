@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.Random;
+import task.estimations.Consts;
 import task.estimations.EstimationPool;
 
 /**
@@ -28,7 +29,7 @@ public abstract class MathUtils {
      * @return значение оценки.
      */
     public static int randomRating(){
-        return rand.nextInt(EstimationPool.Const.highest) + EstimationPool.Const.lowest;
+        return rand.nextInt(Consts.highest) + Consts.lowest;
     }
     
     /**
