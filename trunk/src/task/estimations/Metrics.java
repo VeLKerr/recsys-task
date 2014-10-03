@@ -18,6 +18,8 @@ public class Metrics {
      * 4. TN.
      */
     private final int[] cnts;
+    private int precision;
+    private int recall;
 
     public Metrics() {
         this.cnts = new int[4];
