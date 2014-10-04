@@ -1,9 +1,7 @@
 
 package task.estimations;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  *
@@ -18,8 +16,9 @@ public class Metrics {
      * 4. TN.
      */
     private final int[] cnts;
-    private int precision;
-    private int recall;
+    private double accuracy;
+    private double precision;
+    private double recall;
 
     public Metrics() {
         this.cnts = new int[4];
@@ -49,7 +48,8 @@ public class Metrics {
     }
     
     public double getAccuracy(){
-        return (double)(cnts[0] + cnts[3]) / sum(cnts);
+        accuracy = (double)(cnts[0] + cnts[3]) / sum(cnts);
+        return accuracy;
     }
     
     private double getMetric(int number){
@@ -57,10 +57,17 @@ public class Metrics {
     }
     
     public double getPrecision(){
-        return getMetric(2);
+        precision = getMetric(2);
+        return precision;
     }
     
     public double getRecall(){
-        return getMetric(1);
+        recall = getMetric(1);
+        return recall;
+    }
+    
+    public double getFMeasure(double beta){
+        double betaSqr = Math.pow(beta, 2.0);
+        return (betaSqr + 1) * precision * recall / (betaSqr * precision + recall);
     }
 }
