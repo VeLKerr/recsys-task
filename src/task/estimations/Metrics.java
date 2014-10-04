@@ -36,7 +36,6 @@ public class Metrics {
         else if(userEst < limit && algorithmRes < limit){
             mt = MetricType.TrueNegative;
         }
-        System.err.println(mt.toInt());
         cnts[mt.toInt()]++;
     }
     
