@@ -8,7 +8,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import static task.Task.beta;
 
 /**
  * Класс для храниения спрогнозированных оценок и эталонной оценки пользователя.
