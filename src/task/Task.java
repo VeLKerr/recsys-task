@@ -85,6 +85,7 @@ public class Task {
                 est.setAvgOnGender(gav.avgOn(sc.getGender()));
                 est.setAvgOnUsersWithGender(gav.avgOnUsersWithGender(sc.getUserId(), sc.getGender()));
                 est.setTrueRating(sc.getRating());
+                est.takeIntoAccMetrics();
 //                gav.add(sc); //дообучение системы
             }
             ConsoleUtils.outputResults(i);

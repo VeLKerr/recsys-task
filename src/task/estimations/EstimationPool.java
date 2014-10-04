@@ -41,10 +41,19 @@ public class EstimationPool {
      * Оценки алгоритмов.
      */
     private final List<Predictor> predictors;
+    private final List<Metrics> metricses;
     
     public EstimationPool() {
         this.estimations = new ArrayList<>();
         this.predictors = new ArrayList<>();
+        this.metricses = new ArrayList<>();
+        fillInitialMetrics();
+    }
+    
+    private void fillInitialMetrics(){
+        for (String algoName : Consts.algoNames) {
+            metricses.add(new Metrics());
+        }
     }
     
     /**
@@ -131,6 +140,13 @@ public class EstimationPool {
         this.estimations.get(estimations.size() - 1).add(index, rating);
     }
     
+    public void takeIntoAccMetrics(){
+        double trueRating = estimations.get(estimations.size() - 1).get(Consts.algoNames.length);
+        for(int i=0; i<Consts.algoNames.length; i++){
+            metricses.get(i).takeIntoAcc(trueRating, estimations.get(estimations.size() - 1).get(i));
+        }
+    }
+    
     /**
      * Перевод матрицы в строку для отображения в консоли.
      * @return строка.
@@ -202,7 +218,7 @@ public class EstimationPool {
         return listPredToString(predictors);
     }
     
-    public static String listPredToString(List<Predictor> preds){
+    private static List<Predictor> sort(List<Predictor> preds){
         List<Predictor> prS = new ArrayList<>();
         for(Predictor pred: preds){
             try{
@@ -213,6 +229,22 @@ public class EstimationPool {
             }
         }
         Collections.sort(prS);
+        return prS;
+    }
+    
+    public static String listPredMetrToString(List<Predictor> preds, List<Metrics> metrics){
+        List<Predictor> prS = sort(preds);
+        StringBuilder sb = new StringBuilder("MAE \t NMAE \t RMSE \t NRMSE\t Accur. \t Prec. \t Recall \t F-meas.\n");
+        for(Predictor pred: prS){
+            sb.append(pred.toString());
+            //TODO!!!!
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+    
+    public static String listPredToString(List<Predictor> preds){
+        List<Predictor> prS = sort(preds);
         StringBuilder sb = new StringBuilder("MAE \t NMAE \t RMSE \t NRMSE\n");
         for(Predictor pred: prS){
             sb.append(pred.toString()).append("\n");

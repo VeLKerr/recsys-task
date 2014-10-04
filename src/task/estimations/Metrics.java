@@ -10,10 +10,10 @@ import java.util.Arrays;
 public class Metrics {
     private static final double limit = (Consts.highest + Consts.lowest) / 2;
     /**
-     * 1. TP,
-     * 2. FN,
-     * 3. FP,
-     * 4. TN.
+     * 0. TP,
+     * 1. FN,
+     * 2. FP,
+     * 3. TN.
      */
     private final int[] cnts;
     private double accuracy;
@@ -26,17 +26,18 @@ public class Metrics {
     }
     
     public void takeIntoAcc(double userEst, double algorithmRes){
-        int type = 0;
+        MetricType mt = MetricType.TruePositive;
         if(userEst >= limit && algorithmRes < limit){
-            type = 1;
+            mt = MetricType.FalseNegative;
         }
         else if(userEst < limit && algorithmRes >= limit){
-            type = 2;
+            mt = MetricType.FalsePositive;
         }
         else if(userEst < limit && algorithmRes < limit){
-            type = 3;
+            mt = MetricType.TrueNegative;
         }
-        cnts[type]++;
+        System.err.println(mt.toInt());
+        cnts[mt.toInt()]++;
     }
     
     private static double sum(int[] mas){
