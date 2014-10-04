@@ -188,7 +188,7 @@ public class GeneralAverageRating extends AverageRating{
      * @return сумма всех оценок, присутствующих в хранилище.
      */
     public int getSum() {
-        return MathUtils.round(sum);
+        return MathUtils.roundToInt(sum);
     }
     
     /**

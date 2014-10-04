@@ -37,7 +37,7 @@ public abstract class MathUtils {
      * @param value дробное число.
      * @return целое число.
      */
-    public static int round(double value){
+    public static int roundToInt(double value){
         return (int)roundDouble(value, 0);
     }
     
@@ -47,7 +47,11 @@ public abstract class MathUtils {
      * @param symbolsAfterComma кол-во знаков после запятой в округлённом числе.
      * @return округлённое дробное число.
      */
-    public static double roundDouble(double value, int symbolsAfterComma){
+    private static double roundDouble(double value, int symbolsAfterComma){
         return new BigDecimal(value).setScale(symbolsAfterComma, RoundingMode.HALF_UP).doubleValue();
+    }
+    
+    public static double roundDouble(double value){
+        return roundDouble(value, Consts.symbolsAfterComma);
     }
 }

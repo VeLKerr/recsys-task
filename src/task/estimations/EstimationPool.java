@@ -25,15 +25,6 @@ import java.util.Map.Entry;
  */
 public class EstimationPool {
     /**
-     * Класс констант
-     */
-    public static abstract class Const{
-        /**
-         * Кол-во символов после запятой при округлении десятичных дробей.
-         */
-        public static final int symbolsAfterComma = 5;
-    }
-    /**
      * Матрица прогнозов оценок, рассчитанных с помощью разных алгоритмов.
      */
     private final List<List<Double>> estimations;
@@ -195,7 +186,7 @@ public class EstimationPool {
      */
     public void countEstimates(){
         for(int i=1; i<Consts.algoNames.length + 1; i++){
-            Predictor pred = new Predictor(Consts.algoNames[i-1]);
+            Predictor pred = new Predictor(i - 1);
             double mae = countMAE(i);
             double rmse = countRMSE(i);
             int diff = Consts.highest - Consts.lowest;
@@ -215,7 +206,8 @@ public class EstimationPool {
      */
     public String estimatesToString(){
         countEstimates();
-        return listPredToString(predictors);
+        //return listPredToString(predictors);
+        return listPredMetrToString(predictors, metricses);
     }
     
     private static List<Predictor> sort(List<Predictor> preds){
@@ -234,10 +226,14 @@ public class EstimationPool {
     
     public static String listPredMetrToString(List<Predictor> preds, List<Metrics> metrics){
         List<Predictor> prS = sort(preds);
-        StringBuilder sb = new StringBuilder("MAE \t NMAE \t RMSE \t NRMSE\t Accur. \t Prec. \t Recall \t F-meas.\n");
+        StringBuilder sb = new StringBuilder("MAE\t NMAE\t RMSE\t NRMSE\t Accur.\t Prec.\t Recall\t F-meas(beta = ");
+        sb.append(Consts.beta).append(")\n");
         for(Predictor pred: prS){
-            sb.append(pred.toString());
-            //TODO!!!!
+            sb.append(pred.toString(false));
+            Metrics metric = metrics.get(pred.getAlgoId());
+            metric.count(Consts.beta);
+            sb.append(metric.toString());
+            sb.append("- ").append(pred.getName());
             sb.append("\n");
         }
         return sb.toString();
@@ -265,7 +261,7 @@ public class EstimationPool {
      * @param estimationPools оценки по всем прогонам.
      * @return сводная таблица средних значений.
      */
-    public static List<Predictor> avg(List<EstimationPool> estimationPools){
+    public static List<Predictor> avgPredictors(List<EstimationPool> estimationPools){
         List<Predictor> res = estimationPools.get(0).predictors;
         for(EstimationPool est: estimationPools.subList(1, estimationPools.size())){
             for(int j=0; j<res.size(); j++){
@@ -276,6 +272,19 @@ public class EstimationPool {
             pred.divide(estimationPools.size());
         }
         return res;
+    }
+    
+    public static List<Metrics> avgMetrics(List<EstimationPool> estimationPools){
+        List<Metrics> metricsList = estimationPools.get(0).metricses;
+        for(EstimationPool est: estimationPools.subList(1, estimationPools.size())){
+            for(int j=0; j<metricsList.size(); j++){
+                metricsList.get(j).addMetrics(est.metricses.get(j));
+            }
+        }
+        for(Metrics m: metricsList){
+            m.divide(estimationPools.size());
+        }
+        return metricsList;
     }
     
     @Deprecated
@@ -291,7 +300,7 @@ public class EstimationPool {
         }
         for(int i=0; i<preds.size(); i++){ 
             if(i != gaugeIndex){
-                Predictor pr = new Predictor(preds.get(i).getName());
+                Predictor pr = new Predictor(preds.get(i).getAlgoId());
                 for(int j=0; j<gauge.getEstimations().size(); j++){
                     pr.addEstim(countGaining(gauge.getEstimations().get(j),
                             preds.get(i).getEstimations().get(j)));
