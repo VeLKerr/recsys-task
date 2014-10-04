@@ -4,14 +4,13 @@ package task.utils;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import task.estimations.EstimationPool;
 
 /**
  *
  * @author Ivchenko Oleg (Kirius VeLKerr)
  */
 public class ConsoleUtils {
-    private static int symbCnt = 74;
+    private static final int symbCnt = 80;
     private ConsoleUtils(){
     }
     
@@ -42,8 +41,7 @@ public class ConsoleUtils {
     
     public static void outputPercentageMap(Map<String, Double> percentage){
         for(Entry<String, Double> entry: percentage.entrySet()){
-            System.out.println(MathUtils.roundDouble(entry.getValue(), 
-                    EstimationPool.Const.symbolsAfterComma + 1) + "%\t- " + entry.getKey());
+            System.out.println(MathUtils.roundDouble(entry.getValue()) + "%\t- " + entry.getKey());
         }
     }
     

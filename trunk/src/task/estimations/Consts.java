@@ -4,7 +4,7 @@ package task.estimations;
 import task.Task;
 
 /**
- *
+ * Класс глобальных констант для всего проекта.
  * @author Ivchenko Oleg (Kirius VeLKerr)
  */
 public abstract class Consts {
@@ -18,4 +18,10 @@ public abstract class Consts {
      */
     public static final int highest = 5;
     public static final int lowest = 1;
+    
+    public static final double beta = 0.0;
+    /**
+     * Кол-во символов после запятой при округлении десятичных дробей.
+     */
+    public static final int symbolsAfterComma = 5;
 }

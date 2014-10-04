@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import task.estimations.EstimationPool;
+import task.estimations.Metrics;
 import task.estimations.Predictor;
 import task.learning.GeneralAverageRating;
 import task.learning.Users;
@@ -96,8 +97,10 @@ public class Task {
             estimationPools.add(est);
         }
         ConsoleUtils.outputAverages();
-        List<Predictor> preds = EstimationPool.avg(estimationPools);
-        System.out.println(EstimationPool.listPredToString(preds));
+        List<Predictor> preds = EstimationPool.avgPredictors(estimationPools);
+        List<Metrics> metricsList = EstimationPool.avgMetrics(estimationPools);
+        System.out.println(EstimationPool.listPredMetrToString(preds, metricsList));
+//        System.out.println(EstimationPool.listPredToString(preds));
         ConsoleUtils.outputGaining();
         ConsoleUtils.outputPercentageMap(EstimationPool.gainingPercentage(preds));
     }

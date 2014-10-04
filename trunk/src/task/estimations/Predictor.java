@@ -3,7 +3,6 @@ package task.estimations;
 
 import java.util.ArrayList;
 import java.util.List;
-import static task.estimations.EstimationPool.Const.symbolsAfterComma;
 import task.utils.MathUtils;
 
 /**
@@ -25,10 +24,12 @@ public class Predictor implements Comparable<Predictor>, Cloneable{
      * Название предиктора.
      */
     private String name;
+    private int id;
     
-    public Predictor(String name){
+    public Predictor(int algoId){
         this.estimations = new ArrayList<>();
-        this.name = name;
+        this.name = Consts.algoNames[algoId];
+        this.id = algoId;
     }
     
     private Predictor(String name, List<Double> estimations){
@@ -44,14 +45,20 @@ public class Predictor implements Comparable<Predictor>, Cloneable{
         estimations.add(estimation);
     }
     
-    @Override
-    public String toString(){
+    public String toString(boolean withName){
         StringBuilder sb = new StringBuilder();
         for(double est: estimations){
-            sb.append(MathUtils.roundDouble(est, symbolsAfterComma)).append("\t");
+            sb.append(MathUtils.roundDouble(est)).append("\t");
         }
-        sb.append("- ").append(name);
+        if(withName){
+            sb.append("- ").append(name);
+        }
         return sb.toString();
+    }
+    
+    @Override
+    public String toString(){
+        return toString(true);
     }
 
     @Override
@@ -73,6 +80,10 @@ public class Predictor implements Comparable<Predictor>, Cloneable{
 
     public String getName() {
         return name;
+    }
+    
+    public int getAlgoId(){
+        return id;
     }
     
     protected void addPredictor(Predictor pred){
