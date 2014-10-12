@@ -25,6 +25,7 @@ import task.utils.ConsoleUtils;
  * @author Ivchenko Oleg (Kirius VeLKerr)
  */
 public class EstimationPool {
+    private static final int CHECK_CNT = 2;
     /**
      * Матрица прогнозов оценок, рассчитанных с помощью разных алгоритмов.
      */
@@ -36,6 +37,7 @@ public class EstimationPool {
     private final List<Metrics> metricses;
     private final List<List<Metrics>> metricsesFor2Way;
     private final List<Metrics> avgMetricsesFor2Way;
+    private final TimeChecker tc;
     
     public EstimationPool(double step) {
         this.estimations = new ArrayList<>();
@@ -43,19 +45,24 @@ public class EstimationPool {
         this.metricses = new ArrayList<>();
         this.metricsesFor2Way = new ArrayList<>();
         this.avgMetricsesFor2Way = new ArrayList<>();
+        this.tc = new TimeChecker(CHECK_CNT);
         Metrics.setStep(step);
         fillInitialMetrics();
     }
     
     private void fillInitialMetrics(){
         for (String algoName : Consts.algoNames) {
+            tc.check();
             metricses.add(new Metrics());
+            tc.check();
             List<Metrics> metrs = new ArrayList<>();
             metrs.add(new Metrics().setDelimiter(Consts.Delimiters.initialDelimiter));
             while(metrs.get(metrs.size() - 1).getDelimiter() < Consts.Delimiters.finalDelimiter){
                 metrs.add(new Metrics().setDelimiter(metrs.get(metrs.size() - 1)));
             }
             metricsesFor2Way.add(metrs);
+            tc.check();
+            tc.clearCounters();
         }
     }
     
@@ -147,10 +154,14 @@ public class EstimationPool {
         double trueRating = estimations.get(estimations.size() - 1).get(Consts.algoNames.length);
         for(int i=0; i<Consts.algoNames.length; i++){
             double algoRating = estimations.get(estimations.size() - 1).get(i);
+            tc.check();
             metricses.get(i).takeIntoAcc(trueRating, algoRating);
+            tc.check();
             for(int j=0; j<metricsesFor2Way.get(i).size(); j++){
                 metricsesFor2Way.get(i).get(j).takeIntoAcc(trueRating, algoRating);
             }
+            tc.check();
+            tc.clearCounters();
         }
     }
     
@@ -216,26 +227,28 @@ public class EstimationPool {
     }
     
     private void countMetrics(){
+        tc.check();
         for(int i=0; i<metricses.size(); i++){
             metricses.get(i).count(Consts.beta);
         }
+        tc.check();
         for(List<Metrics> metrs: metricsesFor2Way){
             for(int j=0; j<metrs.size(); j++){
                 metrs.get(j).count(Consts.beta);
             }
             avgMetricsesFor2Way.add(Metrics.avg(metrs));
         }
+        tc.check();
+        tc.clearCounters();
     }
     
     /**
      * Перевод матрицы оценок в строку.
      * @return строковое представление матрицы оценок.
-     * @deprecated 
      */
     public String estimatesToString(boolean isFirstWay){
         countEstimates();
         countMetrics();
-        //return listPredToString(predictors);
         if(isFirstWay){
             return listPredMetrToString(predictors, metricses, isFirstWay);
         }
@@ -243,6 +256,7 @@ public class EstimationPool {
         sb.append(listPredToString(predictors));
         sb.append(ConsoleUtils.strOutput('-')).append("\n");
         sb.append(listAllMetrToString(predictors, metricses, avgMetricsesFor2Way));
+        sb.append(timesToString(tc.getTimes(TimeChecker.TimePrecision.NANOSEC)));
         return sb.toString();
     }
     
@@ -271,9 +285,27 @@ public class EstimationPool {
         }
     }
     
+    private static String timesToString(long[] millis){
+        StringBuilder sb = new StringBuilder();
+        for(int i=0; i<millis.length; i++){
+            sb.append("|\ttime = ").append(millis[i]).append(" ns");
+            appendTabs(sb, 3);
+        }
+        return sb.toString();
+    }
+    
+    private static String timesToString(double[] millis){
+        StringBuilder sb = new StringBuilder();
+        for(int i=0; i<millis.length; i++){
+            sb.append("|\ttime = ").append(millis[i]).append(" ns");
+            appendTabs(sb, 3);
+        }
+        return sb.toString();
+    }
+    
     private static void appendWayNames(StringBuilder sb){
         int tabCnt = 2;
-        sb.append("|");
+        sb.append("");
         appendTabs(sb, tabCnt);
         sb.append("-= 1 =-");
         appendTabs(sb, tabCnt + 1);

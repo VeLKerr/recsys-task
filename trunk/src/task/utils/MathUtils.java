@@ -7,17 +7,59 @@
 package task.utils;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.List;
 import java.util.Random;
 import task.estimations.Consts;
-import task.estimations.EstimationPool;
+import task.estimations.TimeChecker;
 
 /**
  * Класс утилит.
  * @author Ivchenko Oleg (Kirius VeLKerr)
  */
 public abstract class MathUtils {
+    public static abstract class AvgCountMethods{
+        public static double[] avgListD(List<double[]> list){
+            double[] res = new double[list.get(0).length];
+            int size = list.size();
+            for(double[] mas: list){
+                for(int j=0; j<mas.length; j++){
+                    res[j] += mas[j];
+                }
+            }
+            for(int i=0; i<res.length; i++){
+                res[i] /= size;
+            }
+            return res;
+        }
+        
+        public static double[] avgListL(List<long[]> list){
+            double[] res = new double[list.get(0).length];
+            int size = list.size();
+            for(long[] mas: list){
+                for(int j=0; j<mas.length; j++){
+                    res[j] += mas[j];
+                }
+            }
+            for(int i=0; i<res.length; i++){
+                res[i] /= size;
+            }
+            return res;
+        }
+
+        /**
+         *
+         * @param mas the value of mas
+         * @return the double
+         */
+        public static double sum(int[] mas) {
+            int res = 0;
+            for (int el : mas) {
+                res += el;
+            }
+            return res;
+        }
+    }
     /**
      * Экземпляр генератора случайных чисел.
      */
