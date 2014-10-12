@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import task.utils.ConsoleUtils;
 
 /**
  * Класс для храниения спрогнозированных оценок и эталонной оценки пользователя.
@@ -33,17 +34,28 @@ public class EstimationPool {
      */
     private final List<Predictor> predictors;
     private final List<Metrics> metricses;
+    private final List<List<Metrics>> metricsesFor2Way;
+    private final List<Metrics> avgMetricsesFor2Way;
     
-    public EstimationPool() {
+    public EstimationPool(double step) {
         this.estimations = new ArrayList<>();
         this.predictors = new ArrayList<>();
         this.metricses = new ArrayList<>();
+        this.metricsesFor2Way = new ArrayList<>();
+        this.avgMetricsesFor2Way = new ArrayList<>();
+        Metrics.setStep(step);
         fillInitialMetrics();
     }
     
     private void fillInitialMetrics(){
         for (String algoName : Consts.algoNames) {
             metricses.add(new Metrics());
+            List<Metrics> metrs = new ArrayList<>();
+            metrs.add(new Metrics().setDelimiter(Consts.Delimiters.initialDelimiter));
+            while(metrs.get(metrs.size() - 1).getDelimiter() < Consts.Delimiters.finalDelimiter){
+                metrs.add(new Metrics().setDelimiter(metrs.get(metrs.size() - 1)));
+            }
+            metricsesFor2Way.add(metrs);
         }
     }
     
@@ -134,7 +146,11 @@ public class EstimationPool {
     public void takeIntoAccMetrics(){
         double trueRating = estimations.get(estimations.size() - 1).get(Consts.algoNames.length);
         for(int i=0; i<Consts.algoNames.length; i++){
-            metricses.get(i).takeIntoAcc(trueRating, estimations.get(estimations.size() - 1).get(i));
+            double algoRating = estimations.get(estimations.size() - 1).get(i);
+            metricses.get(i).takeIntoAcc(trueRating, algoRating);
+            for(int j=0; j<metricsesFor2Way.get(i).size(); j++){
+                metricsesFor2Way.get(i).get(j).takeIntoAcc(trueRating, algoRating);
+            }
         }
     }
     
@@ -184,7 +200,7 @@ public class EstimationPool {
      *  <li>normalized root mean squared error.</li>
      * </ul>
      */
-    public void countEstimates(){
+    private void countEstimates(){
         for(int i=1; i<Consts.algoNames.length + 1; i++){
             Predictor pred = new Predictor(i - 1);
             double mae = countMAE(i);
@@ -199,15 +215,35 @@ public class EstimationPool {
         //Collections.sort(predictors);
     }
     
+    private void countMetrics(){
+        for(int i=0; i<metricses.size(); i++){
+            metricses.get(i).count(Consts.beta);
+        }
+        for(List<Metrics> metrs: metricsesFor2Way){
+            for(int j=0; j<metrs.size(); j++){
+                metrs.get(j).count(Consts.beta);
+            }
+            avgMetricsesFor2Way.add(Metrics.avg(metrs));
+        }
+    }
+    
     /**
      * Перевод матрицы оценок в строку.
      * @return строковое представление матрицы оценок.
      * @deprecated 
      */
-    public String estimatesToString(){
+    public String estimatesToString(boolean isFirstWay){
         countEstimates();
+        countMetrics();
         //return listPredToString(predictors);
-        return listPredMetrToString(predictors, metricses);
+        if(isFirstWay){
+            return listPredMetrToString(predictors, metricses, isFirstWay);
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(listPredToString(predictors));
+        sb.append(ConsoleUtils.strOutput('-')).append("\n");
+        sb.append(listAllMetrToString(predictors, metricses, avgMetricsesFor2Way));
+        return sb.toString();
     }
     
     private static List<Predictor> sort(List<Predictor> preds){
@@ -224,15 +260,63 @@ public class EstimationPool {
         return prS;
     }
     
-    public static String listPredMetrToString(List<Predictor> preds, List<Metrics> metrics){
+    private static void appendMetricsHeader(StringBuilder sb){
+        sb.append("Accur.\t Prec.\t Recall\t F-meas(beta = ");
+        sb.append(Consts.beta).append(")");
+    }
+    
+    private static void appendTabs(StringBuilder sb, int tabCnt){
+        for(int i=0; i<tabCnt; i++){
+            sb.append("\t");
+        }
+    }
+    
+    private static void appendWayNames(StringBuilder sb){
+        int tabCnt = 2;
+        sb.append("|");
+        appendTabs(sb, tabCnt);
+        sb.append("-= 1 =-");
+        appendTabs(sb, tabCnt + 1);
+        sb.append("|");
+        appendTabs(sb, tabCnt + 1);
+        sb.append("-= 2 =-");
+        appendTabs(sb, tabCnt);
+        sb.append("\n");
+    }
+    
+    public static String listAllMetrToString(List<Predictor> preds, List<Metrics> metrics1Way, List<Metrics> metrics2Way){
         List<Predictor> prS = sort(preds);
-        StringBuilder sb = new StringBuilder("MAE\t NMAE\t RMSE\t NRMSE\t Accur.\t Prec.\t Recall\t F-meas(beta = ");
-        sb.append(Consts.beta).append(")\n");
+        StringBuilder sb = new StringBuilder();
+        appendMetricsHeader(sb);
+        sb.append("|\t");
+        appendMetricsHeader(sb);
+        sb.append("\n");
+        appendWayNames(sb);
         for(Predictor pred: prS){
-            sb.append(pred.toString(false));
-            Metrics metric = metrics.get(pred.getAlgoId());
-            metric.count(Consts.beta);
-            sb.append(metric.toString());
+            sb.append(metrics1Way.get(pred.getAlgoId()).toString());
+            sb.append("\t|\t");
+            sb.append(metrics2Way.get(pred.getAlgoId()).toString());
+            sb.append("- ").append(pred.getName());
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+    
+    public static String listPredMetrToString(List<Predictor> preds, List<Metrics> metrics, boolean withPreds){
+        List<Predictor> prS = sort(preds);
+        StringBuilder sb = new StringBuilder();
+        if(withPreds){
+            sb.append("MAE\t NMAE\t RMSE\t NRMSE\t ");
+        }
+        appendMetricsHeader(sb);
+        sb.append("\n");
+        for(Predictor pred: prS){
+            if(withPreds){
+                sb.append(pred.toString(false));
+            }
+//            Metrics metric = metrics.get(pred.getAlgoId());
+//            metric.count(Consts.beta);
+            sb.append(metrics.get(pred.getAlgoId()).toString());
             sb.append("- ").append(pred.getName());
             sb.append("\n");
         }
@@ -274,11 +358,22 @@ public class EstimationPool {
         return res;
     }
     
-    public static List<Metrics> avgMetrics(List<EstimationPool> estimationPools){
-        List<Metrics> metricsList = estimationPools.get(0).metricses;
+    public static List<Metrics> avgMetrics(List<EstimationPool> estimationPools, boolean way){
+        List<Metrics> metricsList = new ArrayList<>();
+        if(way){
+            metricsList = estimationPools.get(0).metricses;
+        }
+        else{
+            metricsList = estimationPools.get(0).avgMetricsesFor2Way;
+        }
         for(EstimationPool est: estimationPools.subList(1, estimationPools.size())){
             for(int j=0; j<metricsList.size(); j++){
-                metricsList.get(j).addMetrics(est.metricses.get(j));
+                if(way){
+                    metricsList.get(j).addMetrics(est.metricses.get(j));
+                }
+                else{
+                    metricsList.get(j).addMetrics(est.avgMetricsesFor2Way.get(j));
+                }
             }
         }
         for(Metrics m: metricsList){

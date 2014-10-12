@@ -1,8 +1,8 @@
 
 package task.estimations;
 
-import com.sun.deploy.uitoolkit.impl.fx.Utils;
 import java.util.Arrays;
+import java.util.List;
 import task.utils.MathUtils;
 
 /**
@@ -10,7 +10,8 @@ import task.utils.MathUtils;
  * @author Ivchenko Oleg (Kirius VeLKerr)
  */
 public class Metrics {
-    private static final double limit = (Consts.highest + Consts.lowest) / 2;
+    private static double STEP;
+    private double delimiter;
     /**
      * 0. TP,
      * 1. FN,
@@ -31,17 +32,32 @@ public class Metrics {
         precision = 0;
         recall = 0;
         fMesure = 0;
+        this.delimiter = (Consts.highest + Consts.lowest) / 2;
+    }
+    
+    public static void setStep(double step){
+        STEP = step;
+    }
+    
+    public Metrics setDelimiter(Metrics oldMetrics){
+        this.delimiter = oldMetrics.delimiter + STEP;
+        return this;
+    }
+    
+    public Metrics setDelimiter(double delimiter){
+        this.delimiter = delimiter;
+        return this;
     }
     
     public void takeIntoAcc(double userEst, double algorithmRes){
         MetricType mt = MetricType.TruePositive;
-        if(userEst >= limit && algorithmRes < limit){
+        if(userEst >= delimiter && algorithmRes < delimiter){
             mt = MetricType.FalseNegative;
         }
-        else if(userEst < limit && algorithmRes >= limit){
+        else if(userEst < delimiter && algorithmRes >= delimiter){
             mt = MetricType.FalsePositive;
         }
-        else if(userEst < limit && algorithmRes < limit){
+        else if(userEst < delimiter && algorithmRes < delimiter){
             mt = MetricType.TrueNegative;
         }
         cnts[mt.toInt()]++;
@@ -63,8 +79,8 @@ public class Metrics {
         fMesure = (betaSqr + 1) * precision * recall / (betaSqr * precision + recall);
     }
     
-    private double getMetric(int number){
-        return ((double) cnts[0]) / (cnts[0] + cnts[number]);
+    private double getMetric(int number){//"1 + " - to avoid the NaN case
+        return (1 + (double) cnts[0]) / (1 + cnts[0] + cnts[number]);
     }
     
     @Override
@@ -89,5 +105,25 @@ public class Metrics {
         precision += metrics.precision;
         recall += metrics.recall;
         fMesure += metrics.fMesure;
+    }
+    
+    public static Metrics avg(List<Metrics> metrs){
+        Metrics res = new Metrics();
+        for(Metrics mt: metrs){
+            res.accuracy += mt.accuracy;
+            res.precision += mt.precision;
+            res.recall += mt.recall;
+            res.fMesure += mt.fMesure;
+        }
+        res.divide(metrs.size());
+        return res;
+    }
+
+    public double getDelimiter() {
+        return delimiter;
+    }
+    
+    public static double getStep(){
+        return STEP;
     }
 }

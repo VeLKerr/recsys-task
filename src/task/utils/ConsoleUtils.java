@@ -14,29 +14,30 @@ public class ConsoleUtils {
     private ConsoleUtils(){
     }
     
-    private static void strOutput(char symb){
+    public static String strOutput(char symb){
+        StringBuilder sb = new StringBuilder();
         for(int i=0; i<symbCnt; i++){
-            System.out.print(symb);
+            sb.append(symb);
         }
-        System.out.println("");
+        return sb.toString();
     }
     
     public static void outputResults(int i){
-        strOutput('=');
+        System.out.println(strOutput('='));
         System.out.println("\t\t\tTest #" + i);
-        strOutput('=');
+        System.out.println(strOutput('='));
     }
     
     public static void outputAverages(){
-        strOutput('+');
+        System.out.println(strOutput('+'));
         System.out.println("\t\tAVERAGE VALUES");
-        strOutput('+');
+        System.out.println(strOutput('+'));
     }
     
     public static void outputGaining(){
-        strOutput('*');
+        System.out.println(strOutput('*'));
         System.out.println("\t\tGAINING PERCENTAGE");
-        strOutput('*');
+        System.out.println(strOutput('*'));
     }
     
     public static void outputPercentageMap(Map<String, Double> percentage){
