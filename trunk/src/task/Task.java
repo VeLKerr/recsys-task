@@ -102,8 +102,11 @@ public class Task {
         }
         ConsoleUtils.outputAverages();
         List<Predictor> preds = EstimationPool.avgPredictors(estimationPools);
-        List<Metrics> metricsList = EstimationPool.avgMetrics(estimationPools, true);
-        System.out.println(EstimationPool.listPredMetrToString(preds, metricsList, true));
+        List<Metrics> metrics1List = EstimationPool.avgMetrics(estimationPools, true);
+        List<Metrics> metrics2List = EstimationPool.avgMetrics(estimationPools, false);
+        System.out.print(EstimationPool.listPredToString(preds));
+        System.out.println(ConsoleUtils.strOutput('-'));
+        System.out.println(EstimationPool.listAllMetrToString(preds, metrics1List, metrics2List));
 //        System.out.println(EstimationPool.listPredToString(preds));
         ConsoleUtils.outputGaining();
         ConsoleUtils.outputPercentageMap(EstimationPool.gainingPercentage(preds));
