@@ -13,7 +13,7 @@ public abstract class Consts {
      * эталонного предиктора должно иметь индекс <code>0</code>.
      */
     public static final String[] algoNames = {
-        "average values", 
+        "average over all", 
         "average over the items", 
         "average over the users", 
         "random rating", 
@@ -31,7 +31,7 @@ public abstract class Consts {
     /**
      * Кол-во символов после запятой при округлении десятичных дробей.
      */
-    public static final int symbolsAfterComma = 5;
+    public static final int symbolsAfterComma = 2;
     
     public static abstract class Delimiters{
         public static final int initialDelimiter = 2;

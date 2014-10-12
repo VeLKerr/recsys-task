@@ -110,7 +110,7 @@ public class Task {
         System.out.print(EstimationPool.listAllMetrToString(preds, metrics1List, metrics2List));
         System.out.println(EstimationPool.timesToString(times));
 //        System.out.println(EstimationPool.listPredToString(preds));
-        ConsoleUtils.outputGaining();
-        ConsoleUtils.outputPercentageMap(EstimationPool.gainingPercentage(preds));
+        ConsoleUtils.outputGaining(true);
+        ConsoleUtils.outputPercentageMap(EstimationPool.gainingPercentage(preds), 2);
     }
 }
