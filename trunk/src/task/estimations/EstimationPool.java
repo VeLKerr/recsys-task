@@ -465,6 +465,7 @@ public class EstimationPool {
                         countGaining(gauge, preds.get(i).getEstimations().get(estNumber)));
             }
         }
+        res.put(Consts.algoNames[0] + "(ETALON)", 0.0);
         List<Entry<String, Double>> entries = new LinkedList<>(res.entrySet());
         Collections.sort(entries, new PercentageComparator());
         res.clear();

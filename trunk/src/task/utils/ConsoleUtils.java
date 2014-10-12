@@ -34,13 +34,19 @@ public class ConsoleUtils {
         System.out.println(strOutput('+'));
     }
     
-    public static void outputGaining(){
+    public static void outputGaining(boolean isMAE){
         System.out.println(strOutput('*'));
-        System.out.println("\t\tGAINING PERCENTAGE");
+        String header = "\t\tGAINING PERCENTAGE ";
+        if(isMAE){
+            System.out.println(header + "MAE");
+        }
+        else{
+            System.out.println(header + "RMSE");
+        }
         System.out.println(strOutput('*'));
     }
     
-    public static void outputPercentageMap(Map<String, Double> percentage){
+    public static void outputPercentageMap(Map<String, Double> percentage, int symbolsAfterComma){
         for(Entry<String, Double> entry: percentage.entrySet()){
             System.out.println(MathUtils.roundDouble(entry.getValue()) + "%\t- " + entry.getKey());
         }
