@@ -24,4 +24,9 @@ public abstract class Consts {
      * Кол-во символов после запятой при округлении десятичных дробей.
      */
     public static final int symbolsAfterComma = 5;
+    
+    public static abstract class Delimiters{
+        public static final int initialDelimiter = 2;
+        public static final int finalDelimiter = 5;
+    }
 }

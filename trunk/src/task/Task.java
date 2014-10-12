@@ -35,6 +35,7 @@ public class Task {
      * Коэффициент затухания Бета.
      */
     public static final double beta = Math.pow(10, 6);
+    private static final boolean isFirstWay = false;
     
     private static void fillUsers(String filename) throws FileNotFoundException, IOException{
         Users users = Users.getInstance();
@@ -49,6 +50,9 @@ public class Task {
      * Главная функция программы
      */
     public static void main(String[] args) throws FileNotFoundException, IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        System.out.print("Input double step for computing metrics: ");
+        double step = Double.parseDouble(br.readLine());
         fillUsers("u.user");
         List<EstimationPool> estimationPools = new ArrayList<>();
         FileNameBuilder fnb = FileNameBuilder.getBuilder();
@@ -59,13 +63,13 @@ public class Task {
             GeneralAverageRating gav = new GeneralAverageRating();
             fnb.setParameters(i, false);
             File data = new File(path + fnb.buildFName());
-            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(data)));
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(data)));
             while((line = br.readLine()) != null){
                 sc = new Score(line);
                 gav.add(sc);
             }
             //Тестировка и дообучение
-            EstimationPool est = new EstimationPool();
+            EstimationPool est = new EstimationPool(step);
             fnb.setIsTest(true);
             data = new File(path + fnb.buildFName());
             br = new BufferedReader(new InputStreamReader(new FileInputStream(data)));
@@ -91,15 +95,15 @@ public class Task {
             }
             ConsoleUtils.outputResults(i);
             //вывод матрицы оценок погрешностей алгоритмов.
-            System.out.println(est.estimatesToString());
+            System.out.println(est.estimatesToString(isFirstWay));
 //            est.countEstimates();
 //            System.out.println(EstimationPool.listPredToString(est.getPredictors()));
             estimationPools.add(est);
         }
         ConsoleUtils.outputAverages();
         List<Predictor> preds = EstimationPool.avgPredictors(estimationPools);
-        List<Metrics> metricsList = EstimationPool.avgMetrics(estimationPools);
-        System.out.println(EstimationPool.listPredMetrToString(preds, metricsList));
+        List<Metrics> metricsList = EstimationPool.avgMetrics(estimationPools, true);
+        System.out.println(EstimationPool.listPredMetrToString(preds, metricsList, true));
 //        System.out.println(EstimationPool.listPredToString(preds));
         ConsoleUtils.outputGaining();
         ConsoleUtils.outputPercentageMap(EstimationPool.gainingPercentage(preds));
