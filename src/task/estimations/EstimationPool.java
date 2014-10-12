@@ -261,7 +261,7 @@ public class EstimationPool {
     }
     
     private static void appendMetricsHeader(StringBuilder sb){
-        sb.append("Accur.\t Prec.\t Recall\t F-meas(beta = ");
+        sb.append("Accur.\t Prec.\t Recall\t F-meas(b = ");
         sb.append(Consts.beta).append(")");
     }
     
