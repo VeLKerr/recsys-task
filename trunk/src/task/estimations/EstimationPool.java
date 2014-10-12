@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import task.utils.ConsoleUtils;
+import task.utils.MathUtils;
 
 /**
  * Класс для храниения спрогнозированных оценок и эталонной оценки пользователя.
@@ -26,6 +27,7 @@ import task.utils.ConsoleUtils;
  */
 public class EstimationPool {
     private static final int CHECK_CNT = 2;
+    private static final TimeChecker.TimePrecision tp = TimeChecker.TimePrecision.MICROSEC;
     /**
      * Матрица прогнозов оценок, рассчитанных с помощью разных алгоритмов.
      */
@@ -256,7 +258,7 @@ public class EstimationPool {
         sb.append(listPredToString(predictors));
         sb.append(ConsoleUtils.strOutput('-')).append("\n");
         sb.append(listAllMetrToString(predictors, metricses, avgMetricsesFor2Way));
-        sb.append(timesToString(tc.getTimes(TimeChecker.TimePrecision.NANOSEC)));
+        sb.append(timesToString(tc.getTimes(tp)));
         return sb.toString();
     }
     
@@ -286,19 +288,27 @@ public class EstimationPool {
     }
     
     private static String timesToString(long[] millis){
+        int tabCnt = 3;
+        if(tp.equals(TimeChecker.TimePrecision.MICROSEC)){
+            tabCnt--;
+        }
         StringBuilder sb = new StringBuilder();
         for(int i=0; i<millis.length; i++){
-            sb.append("|\ttime = ").append(millis[i]).append(" ns");
-            appendTabs(sb, 3);
+            sb.append("|\ttime = ").append(millis[i]).append(" ").append(tp.toString());
+            appendTabs(sb, tabCnt);
         }
         return sb.toString();
     }
     
-    private static String timesToString(double[] millis){
+    public static String timesToString(double[] millis){
+        int tabCnt = 3;
+        if(tp.equals(TimeChecker.TimePrecision.MICROSEC)){
+            tabCnt--;
+        }
         StringBuilder sb = new StringBuilder();
         for(int i=0; i<millis.length; i++){
-            sb.append("|\ttime = ").append(millis[i]).append(" ns");
-            appendTabs(sb, 3);
+            sb.append("|\ttime = ").append(millis[i]).append(" ").append(tp.toString());
+            appendTabs(sb, tabCnt);
         }
         return sb.toString();
     }
@@ -466,5 +476,13 @@ public class EstimationPool {
     
     private static double countGaining(double gauge, double value){
         return 100 * (gauge - value) / gauge;
+    }
+    
+    public static double[] avgTimes(List<EstimationPool> eps){
+        List<double[]> times = new ArrayList<>();
+        for(EstimationPool ep: eps){
+            times.add(ep.tc.getTimes(tp));
+        }
+        return MathUtils.AvgCountMethods.avgListD(times);
     }
 }

@@ -2,7 +2,7 @@
 package task.estimations;
 
 /**
- * Класс для автоматизированной замерки врмени рассчёта
+ * Класс для автоматизированной замерки врмени работы.
  * @author Ivchenko Oleg (Kirius VeLKerr)
  */
 public class TimeChecker {
@@ -14,11 +14,21 @@ public class TimeChecker {
             public long getDenominator(){
                 return 1;
             }
+            
+            @Override
+            public String toString(){
+                return "ns";
+            }
         },
         MICROSEC{
             @Override
             public long getDenominator(){
                 return 1000;
+            }
+            
+            @Override
+            public String toString(){
+                return "mcrs";
             }
         },
         MILLISEC{
@@ -26,11 +36,21 @@ public class TimeChecker {
             public long getDenominator(){
                 return 1000000;
             }
+            
+            @Override
+            public String toString(){
+                return "mls";
+            }
         },
         SEC{
             @Override
             public long getDenominator(){
                 return (long)Math.pow(10, 9);
+            }
+            
+            @Override
+            public String toString(){
+                return "sec";
             }
         },
         MINUTES{
@@ -38,17 +58,32 @@ public class TimeChecker {
             public long getDenominator(){
                 return SEC.getDenominator() * 60;
             }
+            
+            @Override
+            public String toString(){
+                return "min";
+            }
         },
         HOURS{
             @Override
             public long getDenominator(){
                 return MINUTES.getDenominator() * 60;
             }
+            
+            @Override
+            public String toString(){
+                return "h";
+            }
         },
         DAYS{
             @Override
             public long getDenominator(){
                 return HOURS.getDenominator() * 24;
+            }
+            
+            @Override
+            public String toString(){
+                return "d";
             }
         };
         
@@ -59,8 +94,8 @@ public class TimeChecker {
     private long lastChecking;
     private int currentCheckingCnt;
 
-    public TimeChecker(int checkCnt) {
-        this.times = new long[checkCnt];
+    public TimeChecker(int processCnt) {
+        this.times = new long[processCnt];
         clearCounters();
     }
     
@@ -80,16 +115,19 @@ public class TimeChecker {
             lastChecking = check;
         }
     }
-
-    public long[] getTimes() {
-        return times;
-    }
     
     public double[] getTimes(TimePrecision tp){
         double[] res = new double[times.length];
         long denom = tp.getDenominator();
-        for(int i=0; i<times.length; i++){
-            res[i] = times[i] / denom;
+        if(tp.equals(TimePrecision.NANOSEC)){
+            for(int i=0; i<times.length; i++){
+                res[i] = times[i];
+            }
+        }
+        else{
+            for(int i=0; i<times.length; i++){
+                res[i] = times[i] / denom;
+            }
         }
         return res;
     }
