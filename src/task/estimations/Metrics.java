@@ -62,17 +62,9 @@ public class Metrics {
         }
         cnts[mt.toInt()]++;
     }
-    
-    private static double sum(int[] mas){
-        int res = 0;
-        for(int el: mas){
-            res += el;
-        }
-        return res;
-    }
-    
+      
     public void count(double beta){
-        accuracy = (double)(cnts[0] + cnts[3]) / sum(cnts);
+        accuracy = (double)(cnts[0] + cnts[3]) / MathUtils.AvgCountMethods.sum(cnts);
         precision = getMetric(2);
         recall = getMetric(1);
         double betaSqr = Math.pow(beta, 2.0);
