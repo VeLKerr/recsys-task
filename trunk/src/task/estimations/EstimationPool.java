@@ -269,16 +269,10 @@ public class EstimationPool {
                 prS.add(pred.clone());
             }
             catch(CloneNotSupportedException cnse){
-                cnse.printStackTrace();
             }
         }
         Collections.sort(prS);
         return prS;
-    }
-    
-    private static void appendMetricsHeader(StringBuilder sb){
-        sb.append("Accur.\t Prec.\t Recall\t F-meas(b = ");
-        sb.append(Consts.beta).append(")");
     }
     
     private static void appendTabs(StringBuilder sb, int tabCnt){
@@ -329,9 +323,9 @@ public class EstimationPool {
     public static String listAllMetrToString(List<Predictor> preds, List<Metrics> metrics1Way, List<Metrics> metrics2Way){
         List<Predictor> prS = sort(preds);
         StringBuilder sb = new StringBuilder();
-        appendMetricsHeader(sb);
+        sb.append(Metrics.headersToString());
         sb.append("|\t");
-        appendMetricsHeader(sb);
+        sb.append(Metrics.headersToString());
         sb.append("\n");
         appendWayNames(sb);
         for(Predictor pred: prS){
@@ -350,7 +344,7 @@ public class EstimationPool {
         if(withPreds){
             sb.append("MAE\t NMAE\t RMSE\t NRMSE\t ");
         }
-        appendMetricsHeader(sb);
+        sb.append(Metrics.headersToString());
         sb.append("\n");
         for(Predictor pred: prS){
             if(withPreds){
