@@ -11,7 +11,7 @@ public class TimeChecker {
     public enum TimePrecision{
         NANOSEC{
             @Override
-            public long getDenominator(){
+            protected long getDenominator(){
                 return 1;
             }
             
@@ -22,7 +22,7 @@ public class TimeChecker {
         },
         MICROSEC{
             @Override
-            public long getDenominator(){
+            protected long getDenominator(){
                 return 1000;
             }
             
@@ -33,7 +33,7 @@ public class TimeChecker {
         },
         MILLISEC{
             @Override
-            public long getDenominator(){
+            protected long getDenominator(){
                 return 1000000;
             }
             
@@ -44,7 +44,7 @@ public class TimeChecker {
         },
         SEC{
             @Override
-            public long getDenominator(){
+            protected long getDenominator(){
                 return (long)Math.pow(10, 9);
             }
             
@@ -55,7 +55,7 @@ public class TimeChecker {
         },
         MINUTES{
             @Override
-            public long getDenominator(){
+            protected long getDenominator(){
                 return SEC.getDenominator() * 60;
             }
             
@@ -66,7 +66,7 @@ public class TimeChecker {
         },
         HOURS{
             @Override
-            public long getDenominator(){
+            protected long getDenominator(){
                 return MINUTES.getDenominator() * 60;
             }
             
@@ -77,7 +77,7 @@ public class TimeChecker {
         },
         DAYS{
             @Override
-            public long getDenominator(){
+            protected long getDenominator(){
                 return HOURS.getDenominator() * 24;
             }
             
@@ -87,7 +87,7 @@ public class TimeChecker {
             }
         };
         
-        public abstract long getDenominator();
+        protected abstract long getDenominator();
     }
     
     private long[] times;
