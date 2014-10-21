@@ -2,7 +2,6 @@
 package task.estimations;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import task.utils.MathUtils;
 
@@ -36,6 +35,30 @@ public class Metrics {
             @Override
             protected String getShortName() {
                 return "F-meas(b = " + Consts.beta + ")";
+            }
+        },
+        NEGATIVE_PRECISION{
+            @Override
+            protected String getShortName() {
+                return "Neg.Prec.";
+            }
+        },
+        SPECIFYCITY{
+            @Override
+            protected String getShortName() {
+                return "Spec.";
+            }
+        },
+        FALSE_DISCOVERY_RATE{
+            @Override
+            protected String getShortName() {
+                return "FDR.";
+            }
+        },
+        FALSE_POSITIVE_RATE{
+            @Override
+            protected String getShortName() {
+                return "FPR.";
             }
         };
         
@@ -94,7 +117,7 @@ public class Metrics {
         else if(userEst < delimiter && algorithmRes < delimiter){
             mt = MetricType.TrueNegative;
         }
-        cnts[mt.toInt()]++;
+        cnts[mt.ordinal()]++;
     }
       
     public void count(double beta){
