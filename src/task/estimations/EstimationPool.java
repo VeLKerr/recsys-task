@@ -282,7 +282,7 @@ public class EstimationPool {
     }
     
     private static String timesToString(long[] millis){
-        int tabCnt = 3;
+        int tabCnt = 8;
         if(tp.equals(TimeChecker.TimePrecision.MICROSEC)){
             tabCnt--;
         }

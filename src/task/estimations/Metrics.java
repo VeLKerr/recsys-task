@@ -59,20 +59,42 @@ public class Metrics {
             protected String getShortName() {
                 return "FPR.";
             }
+            @Override
+            protected boolean isVisible(){
+                return false;
+            }
         },
-        MATTHEW_COEFFICIENT{
+        ALPHA_ERROR{
             @Override
             protected String getShortName() {
-                return "Matthew";
+                return "a-err";
+            }
+        },
+        BETA_ERROR{
+            @Override
+            protected String getShortName() {
+                return "b-err";
             }
         };
+//        MATTHEW{
+//            @Override
+//            protected String getShortName() {
+//                return "Matthew";
+//            }
+//        };
         
         protected abstract String getShortName();
+        
+        protected boolean isVisible(){
+            return true;
+        }
         
         public static String namesToString(){
             StringBuilder sb = new StringBuilder();
             for(MetricNameTypes mnt: MetricNameTypes.values()){
-                sb.append(mnt.getShortName()).append("\t");
+                if(mnt.isVisible()){
+                    sb.append(mnt.getShortName()).append("\t");
+                }
             }
             return sb.toString();
         }
@@ -126,8 +148,9 @@ public class Metrics {
     }
       
     public void count(double beta){
+        double sum = MathUtils.AvgCountMethods.sum(cnts);
         allMetrics.set(MetricNameTypes.ACCURACY.ordinal(), 
-                (double)(cnts[0] + cnts[3]) / MathUtils.AvgCountMethods.sum(cnts));
+                (double)(cnts[0] + cnts[3]) / sum);
         double precision = getMetric(2);
         double recall = getMetric(1);
         allMetrics.set(MetricNameTypes.PRECISION.ordinal(), precision);
@@ -140,11 +163,16 @@ public class Metrics {
                 nominator / (nominator + cnts[1]));
         allMetrics.set(MetricNameTypes.SPECIFYCITY.ordinal(), 
                 nominator / (1 + cnts[0] + cnts[1]));
+//        System.err.println(cnts[0] + " " + cnts[1] + " " + cnts[2] + " " + cnts[3]);
+//        System.err.println("=========" + nominator / (1 + cnts[0] + cnts[1]));
+//        System.err.println("+++++++++++" + allMetrics.get(MetricNameTypes.SPECIFYCITY.ordinal()));
         double rateNominator = 1 + cnts[2];
         allMetrics.set(MetricNameTypes.FALSE_DISCOVERY_RATE.ordinal(), 
                 rateNominator / (rateNominator + cnts[0]));
         allMetrics.set(MetricNameTypes.FALSE_POSITIVE_RATE.ordinal(), 
                 rateNominator / (nominator + cnts[1]));
+        allMetrics.set(MetricNameTypes.ALPHA_ERROR.ordinal(), cnts[2] / sum);
+        allMetrics.set(MetricNameTypes.BETA_ERROR.ordinal(), cnts[1] / sum);
     }
     
     private double getMetric(int number){//"1 + " - to avoid the NaN case
@@ -159,7 +187,9 @@ public class Metrics {
     public String toString(){
         StringBuilder sb = new StringBuilder();
         for(MetricNameTypes mnt: MetricNameTypes.values()){
-            sb.append(MathUtils.roundDouble(allMetrics.get(mnt.ordinal()))).append("\t");
+            if(mnt.isVisible()){
+                sb.append(MathUtils.roundDouble(allMetrics.get(mnt.ordinal()))).append("\t");
+            }
         }
         return sb.toString();
     }
