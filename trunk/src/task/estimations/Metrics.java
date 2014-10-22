@@ -29,18 +29,17 @@ public class Metrics {
             protected String getShortName() {
                 return "Recall";
             }
-            
         },
         F_MEASURE {
             @Override
             protected String getShortName() {
-                return "F-meas(b = " + Consts.beta + ")";
+                return "F1(b=" + (int)Consts.beta + ")";
             }
         },
         NEGATIVE_PRECISION{
             @Override
             protected String getShortName() {
-                return "Neg.Prec.";
+                return "N.Prec.";
             }
         },
         SPECIFYCITY{
@@ -59,6 +58,12 @@ public class Metrics {
             @Override
             protected String getShortName() {
                 return "FPR.";
+            }
+        },
+        MATTHEW_COEFFICIENT{
+            @Override
+            protected String getShortName() {
+                return "Matthew";
             }
         };
         
@@ -130,6 +135,16 @@ public class Metrics {
         double betaSqr = Math.pow(beta, 2.0);
         allMetrics.set(MetricNameTypes.F_MEASURE.ordinal(),
                 (betaSqr + 1) * precision * recall / (betaSqr * precision + recall));
+        double nominator = 1 + cnts[3];
+        allMetrics.set(MetricNameTypes.NEGATIVE_PRECISION.ordinal(), 
+                nominator / (nominator + cnts[1]));
+        allMetrics.set(MetricNameTypes.SPECIFYCITY.ordinal(), 
+                nominator / (1 + cnts[0] + cnts[1]));
+        double rateNominator = 1 + cnts[2];
+        allMetrics.set(MetricNameTypes.FALSE_DISCOVERY_RATE.ordinal(), 
+                rateNominator / (rateNominator + cnts[0]));
+        allMetrics.set(MetricNameTypes.FALSE_POSITIVE_RATE.ordinal(), 
+                rateNominator / (nominator + cnts[1]));
     }
     
     private double getMetric(int number){//"1 + " - to avoid the NaN case
@@ -154,10 +169,6 @@ public class Metrics {
             int ordinal = mnt.ordinal();
             allMetrics.set(ordinal, allMetrics.get(ordinal) / number);
         }
-//        accuracy /= number;
-//        precision /= number;
-//        recall /= number;
-//        fMesure /= number;
     }
     
     public void addMetrics(Metrics metrics){
@@ -165,10 +176,6 @@ public class Metrics {
             int ordinal = mnt.ordinal();
             allMetrics.set(ordinal, allMetrics.get(ordinal) + metrics.allMetrics.get(ordinal));
         }
-//        accuracy += metrics.accuracy;
-//        precision += metrics.precision;
-//        recall += metrics.recall;
-//        fMesure += metrics.fMesure;
     }
     
     public static Metrics avg(List<Metrics> metrs){

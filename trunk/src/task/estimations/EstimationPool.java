@@ -295,7 +295,7 @@ public class EstimationPool {
     }
     
     public static String timesToString(double[] millis){
-        int tabCnt = 3;
+        int tabCnt = 8;
         if(tp.equals(TimeChecker.TimePrecision.MICROSEC)){
             tabCnt--;
         }
@@ -308,11 +308,11 @@ public class EstimationPool {
     }
     
     private static void appendWayNames(StringBuilder sb){
-        int tabCnt = 2;
+        int tabCnt = 5;
         sb.append("");
         appendTabs(sb, tabCnt);
         sb.append("-= 1 =-");
-        appendTabs(sb, tabCnt + 1);
+        appendTabs(sb, tabCnt);
         sb.append("|");
         appendTabs(sb, tabCnt + 1);
         sb.append("-= 2 =-");
@@ -324,7 +324,7 @@ public class EstimationPool {
         List<Predictor> prS = sort(preds);
         StringBuilder sb = new StringBuilder();
         sb.append(Metrics.headersToString());
-        sb.append("|\t");
+        sb.append("\t|\t");
         sb.append(Metrics.headersToString());
         sb.append("\n");
         appendWayNames(sb);
@@ -350,8 +350,6 @@ public class EstimationPool {
             if(withPreds){
                 sb.append(pred.toString(false));
             }
-//            Metrics metric = metrics.get(pred.getAlgoId());
-//            metric.count(Consts.beta);
             sb.append(metrics.get(pred.getAlgoId()).toString());
             sb.append("- ").append(pred.getName());
             sb.append("\n");
