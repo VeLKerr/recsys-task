@@ -282,7 +282,7 @@ public class EstimationPool {
     }
     
     private static String timesToString(long[] millis){
-        int tabCnt = 8;
+        int tabCnt = 9;
         if(tp.equals(TimeChecker.TimePrecision.MICROSEC)){
             tabCnt--;
         }
@@ -295,7 +295,7 @@ public class EstimationPool {
     }
     
     public static String timesToString(double[] millis){
-        int tabCnt = 8;
+        int tabCnt = 9;
         if(tp.equals(TimeChecker.TimePrecision.MICROSEC)){
             tabCnt--;
         }
@@ -312,7 +312,7 @@ public class EstimationPool {
         sb.append("");
         appendTabs(sb, tabCnt);
         sb.append("-= 1 =-");
-        appendTabs(sb, tabCnt);
+        appendTabs(sb, tabCnt + 1);
         sb.append("|");
         appendTabs(sb, tabCnt + 1);
         sb.append("-= 2 =-");
