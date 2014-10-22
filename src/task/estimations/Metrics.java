@@ -75,13 +75,13 @@ public class Metrics {
             protected String getShortName() {
                 return "b-err";
             }
+        },
+        MATTHEW{
+            @Override
+            protected String getShortName() {
+                return "Matthew";
+            }
         };
-//        MATTHEW{
-//            @Override
-//            protected String getShortName() {
-//                return "Matthew";
-//            }
-//        };
         
         protected abstract String getShortName();
         
@@ -117,6 +117,9 @@ public class Metrics {
         for(int i=0; i<MetricNameTypes.values().length; i++){
             allMetrics.add(0.0);
         }
+//        for(int i=0; i<cnts.length; i++){
+//            cnts[i] = 0;
+//        }
     }
     
     public static void setStep(double step){
@@ -146,9 +149,18 @@ public class Metrics {
         }
         cnts[mt.ordinal()]++;
     }
-      
+    
+    private void deNaN(){
+        for(int i=0; i<cnts.length; i++){
+            if(cnts[i] == 0){
+                cnts[i] = 1;
+            }
+        }
+    }
+    
     public void count(double beta){
         double sum = MathUtils.AvgCountMethods.sum(cnts);
+        deNaN();
         allMetrics.set(MetricNameTypes.ACCURACY.ordinal(), 
                 (double)(cnts[0] + cnts[3]) / sum);
         double precision = getMetric(2);
@@ -158,25 +170,33 @@ public class Metrics {
         double betaSqr = Math.pow(beta, 2.0);
         allMetrics.set(MetricNameTypes.F_MEASURE.ordinal(),
                 (betaSqr + 1) * precision * recall / (betaSqr * precision + recall));
-        double nominator = 1 + cnts[3];
-        allMetrics.set(MetricNameTypes.NEGATIVE_PRECISION.ordinal(), 
-                nominator / (nominator + cnts[1]));
-        allMetrics.set(MetricNameTypes.SPECIFYCITY.ordinal(), 
-                nominator / (1 + cnts[0] + cnts[1]));
-//        System.err.println(cnts[0] + " " + cnts[1] + " " + cnts[2] + " " + cnts[3]);
-//        System.err.println("=========" + nominator / (1 + cnts[0] + cnts[1]));
-//        System.err.println("+++++++++++" + allMetrics.get(MetricNameTypes.SPECIFYCITY.ordinal()));
-        double rateNominator = 1 + cnts[2];
-        allMetrics.set(MetricNameTypes.FALSE_DISCOVERY_RATE.ordinal(), 
-                rateNominator / (rateNominator + cnts[0]));
-        allMetrics.set(MetricNameTypes.FALSE_POSITIVE_RATE.ordinal(), 
-                rateNominator / (nominator + cnts[1]));
+//        double nominator = 1 + cnts[3];
+//        allMetrics.set(MetricNameTypes.NEGATIVE_PRECISION.ordinal(), 
+//                nominator / (nominator + cnts[1]));
+//        allMetrics.set(MetricNameTypes.SPECIFYCITY.ordinal(), 
+//                nominator / (cnts[0] + cnts[1]));
+//        double rateNominator = 1 + cnts[2];
+//        allMetrics.set(MetricNameTypes.FALSE_DISCOVERY_RATE.ordinal(), 
+//                rateNominator / (rateNominator + cnts[0]));
+//        allMetrics.set(MetricNameTypes.FALSE_POSITIVE_RATE.ordinal(), 
+//                rateNominator / (nominator + cnts[1]));
+        allMetrics.set(MetricNameTypes.NEGATIVE_PRECISION.ordinal(), (double)cnts[3] / (cnts[3] + cnts[1]));
+        allMetrics.set(MetricNameTypes.SPECIFYCITY.ordinal(), (double)cnts[3] / (cnts[0] + cnts[1]));
+        allMetrics.set(MetricNameTypes.FALSE_DISCOVERY_RATE.ordinal(), (double)cnts[2] / (cnts[2] + cnts[0]));
+        allMetrics.set(MetricNameTypes.FALSE_POSITIVE_RATE.ordinal(), (double)cnts[2] / (cnts[3] + cnts[1]));
         allMetrics.set(MetricNameTypes.ALPHA_ERROR.ordinal(), cnts[2] / sum);
         allMetrics.set(MetricNameTypes.BETA_ERROR.ordinal(), cnts[1] / sum);
+        allMetrics.set(MetricNameTypes.MATTHEW.ordinal(),
+                   (cnts[0]*cnts[3] - cnts[1]*cnts[2]) /  
+                   Math.sqrt((double)(cnts[0] + cnts[1])*(cnts[2] + cnts[3])*(cnts[0] + cnts[2])*(cnts[1] + cnts[3])));
     }
     
+//    private double getMetric(int number){//"1 + " - to avoid the NaN case
+//        return (1 + (double) cnts[0]) / (1 + cnts[0] + cnts[number]);
+//    }
+    
     private double getMetric(int number){//"1 + " - to avoid the NaN case
-        return (1 + (double) cnts[0]) / (1 + cnts[0] + cnts[number]);
+        return (double) cnts[0] / (cnts[0] + cnts[number]);
     }
     
     public static String headersToString(){
