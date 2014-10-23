@@ -170,16 +170,6 @@ public class Metrics {
         double betaSqr = Math.pow(beta, 2.0);
         allMetrics.set(MetricNameTypes.F_MEASURE.ordinal(),
                 (betaSqr + 1) * precision * recall / (betaSqr * precision + recall));
-//        double nominator = 1 + cnts[3];
-//        allMetrics.set(MetricNameTypes.NEGATIVE_PRECISION.ordinal(), 
-//                nominator / (nominator + cnts[1]));
-//        allMetrics.set(MetricNameTypes.SPECIFYCITY.ordinal(), 
-//                nominator / (cnts[0] + cnts[1]));
-//        double rateNominator = 1 + cnts[2];
-//        allMetrics.set(MetricNameTypes.FALSE_DISCOVERY_RATE.ordinal(), 
-//                rateNominator / (rateNominator + cnts[0]));
-//        allMetrics.set(MetricNameTypes.FALSE_POSITIVE_RATE.ordinal(), 
-//                rateNominator / (nominator + cnts[1]));
         allMetrics.set(MetricNameTypes.NEGATIVE_PRECISION.ordinal(), (double)cnts[3] / (cnts[3] + cnts[1]));
         allMetrics.set(MetricNameTypes.SPECIFYCITY.ordinal(), (double)cnts[3] / (cnts[0] + cnts[1]));
         allMetrics.set(MetricNameTypes.FALSE_DISCOVERY_RATE.ordinal(), (double)cnts[2] / (cnts[2] + cnts[0]));
@@ -188,7 +178,12 @@ public class Metrics {
         allMetrics.set(MetricNameTypes.BETA_ERROR.ordinal(), cnts[1] / sum);
         allMetrics.set(MetricNameTypes.MATTHEW.ordinal(),
                    (cnts[0]*cnts[3] - cnts[1]*cnts[2]) /  
-                   Math.sqrt((double)(cnts[0] + cnts[1])*(cnts[2] + cnts[3])*(cnts[0] + cnts[2])*(cnts[1] + cnts[3])));
+                   Math.sqrt(Math.exp(
+                           countDenomTerm(0, 1) + countDenomTerm(2, 3) + countDenomTerm(0, 2) + countDenomTerm(1, 3))));
+    }
+    
+    private double countDenomTerm(int numb1, int numb2){
+        return Math.log(cnts[numb1] + cnts[numb2]);
     }
     
 //    private double getMetric(int number){//"1 + " - to avoid the NaN case
