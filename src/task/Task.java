@@ -12,6 +12,7 @@ import java.util.List;
 import task.estimations.EstimationPool;
 import task.estimations.Metrics;
 import task.estimations.Predictor;
+import task.knnRecommender.ScoreSupervisor;
 import task.learning.GeneralAverageRating;
 import task.learning.Users;
 import task.utils.FileNameBuilder;
@@ -61,12 +62,14 @@ public class Task {
         for(int i=1; i<=testCnt; i++){//change to testCnt
             //Обучение
             GeneralAverageRating gav = new GeneralAverageRating();
+            ScoreSupervisor scoreSupervisor = new ScoreSupervisor();
             fnb.setParameters(i, false);
             File data = new File(path + fnb.buildFName());
             br = new BufferedReader(new InputStreamReader(new FileInputStream(data)));
             while((line = br.readLine()) != null){
                 sc = new Score(line);
                 gav.add(sc);
+                scoreSupervisor.add(sc);
             }
             //Тестировка и дообучение
             EstimationPool est = new EstimationPool(step);
