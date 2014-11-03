@@ -8,6 +8,7 @@ import task.Task;
  * @author Ivchenko Oleg (Kirius VeLKerr)
  */
 public abstract class Consts {
+    public static final int UNDEFINED = Integer.MAX_VALUE;
     /**
      * Названия предикторов. Для корректной работы программы, название
      * эталонного предиктора должно иметь индекс <code>0</code>.
