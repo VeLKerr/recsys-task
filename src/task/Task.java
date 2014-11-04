@@ -81,6 +81,7 @@ public class Task {
             fnb.setIsTest(true);
             data = new File(path + fnb.buildFName());
             br = new BufferedReader(new InputStreamReader(new FileInputStream(data)));
+            int __cnter = 0;
             while((line = br.readLine()) != null){
                 sc = new Score(line);
                 est.createNewEmptyEstimationsRow();
@@ -98,17 +99,13 @@ public class Task {
                 est.setAvgOnGender(gav.avgOn(sc.getGender()));
                 est.setAvgOnUsersWithGender(gav.avgOnUsersWithGender(sc.getUserId(), sc.getGender()));
                 scoreSupervisor.setAlgoType(AlgoType.USER_BASED);
-                est.setKNN(gav.avg(), AlgoType.USER_BASED);
+                est.setKNN(scoreSupervisor.getRating(sc), AlgoType.USER_BASED);
                 scoreSupervisor.setAlgoType(AlgoType.ITEM_BASED);
-                est.setKNN(gav.avg(), AlgoType.ITEM_BASED);
+                est.setKNN(scoreSupervisor.getRating(sc), AlgoType.ITEM_BASED);
                 est.setTrueRating(sc.getRating());
                 est.takeIntoAccMetrics();
-                
-                scoreSupervisor.setAlgoType(AlgoType.USER_BASED);
-                double r = scoreSupervisor.getRating(sc);
-                System.err.println(r);
-                scoreSupervisor.setAlgoType(AlgoType.ITEM_BASED);
-                r = scoreSupervisor.getRating(sc);
+                System.out.println(__cnter);
+                __cnter++;
 //                gav.add(sc); //дообучение системы
             }
             ConsoleUtils.outputResults(i);
