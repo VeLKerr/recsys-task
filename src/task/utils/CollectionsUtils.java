@@ -33,4 +33,24 @@ public abstract class CollectionsUtils {
         }
         return totalSize;
     }
+    
+    public static <V extends Collection<?>, W extends Collection<V>> boolean deepIsEmpty(W coll){
+        for(V nestedColl: coll){
+            if(! nestedColl.isEmpty()){
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    public static abstract class Temporary{
+        public static boolean isZeroFilled(double[] mas){
+            for(int i=0; i<mas.length; i++){
+                if(mas[i] != 0){
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
 }
