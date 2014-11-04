@@ -47,4 +47,8 @@ public abstract class Consts {
         public static final int ITEMS_CNT = 1682;
         public static final int RATINGS_CNT = 100000;
     }
+    
+    public static abstract class Advaced{
+        public static final int MAX_MISMATCHES_DENOMINATOR = 100;
+    }
 }

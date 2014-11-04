@@ -18,7 +18,6 @@ import task.utils.MathUtils;
  * @author Ivchenko Oleg (Kirius VeLKerr)
  */
 public class ScoreSupervisor {
-    private static final int MAX_MISMATCHES_DELIMITER = 50;
     private static final PearsonsCorrelation pc = new PearsonsCorrelation();
     private final RealMatrix scoreMatrix;
     private final int k;
@@ -54,7 +53,6 @@ public class ScoreSupervisor {
                 return false;
             }
         }
-        //System.err.println(mismatches);
         if(isEmpty){
             throw new NewUserOrItemException();
         }
@@ -66,7 +64,7 @@ public class ScoreSupervisor {
         double[] ethalon = get(sc.getId(at) - 1);
         int cnt = 0;
         int mLimit = 0;
-        while(cnt < k && mLimit < getSize(at) / MAX_MISMATCHES_DELIMITER){
+        while(cnt < k && mLimit < getSize(at) / Consts.Advaced.MAX_MISMATCHES_DENOMINATOR){
             List<Integer> indexes = new ArrayList<>();
             for(int i=0; i<getSize(at); i++){
                 if(i != sc.getId(at) - 1 && 
@@ -75,9 +73,6 @@ public class ScoreSupervisor {
                     indexes.add(i);
                     cnt++;
                 }
-            }
-            if(cnt >= k){
-                break;
             }
             res.add(indexes);
             mLimit++;
