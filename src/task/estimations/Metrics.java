@@ -11,6 +11,12 @@ import task.utils.MathUtils;
  */
 public class Metrics {
     private static double STEP;
+    private enum ClassificationType {
+        TruePositive, 
+        FalseNegative, 
+        FalsePositive,
+        TrueNegative
+    };
     private enum MetricNameTypes{
         ACCURACY {
             @Override
@@ -46,6 +52,12 @@ public class Metrics {
             @Override
             protected String getShortName() {
                 return "Spec.";
+            }
+        },
+        SENSITIVITY{
+            @Override
+            protected String getShortName() {
+                return "Sens.";
             }
         },
         FALSE_DISCOVERY_RATE{
@@ -117,9 +129,6 @@ public class Metrics {
         for(int i=0; i<MetricNameTypes.values().length; i++){
             allMetrics.add(0.0);
         }
-//        for(int i=0; i<cnts.length; i++){
-//            cnts[i] = 0;
-//        }
     }
     
     public static void setStep(double step){
@@ -137,15 +146,15 @@ public class Metrics {
     }
     
     public void takeIntoAcc(double userEst, double algorithmRes){
-        MetricType mt = MetricType.TruePositive;
+        ClassificationType mt = ClassificationType.TruePositive;
         if(userEst >= delimiter && algorithmRes < delimiter){
-            mt = MetricType.FalseNegative;
+            mt = ClassificationType.FalseNegative;
         }
         else if(userEst < delimiter && algorithmRes >= delimiter){
-            mt = MetricType.FalsePositive;
+            mt = ClassificationType.FalsePositive;
         }
         else if(userEst < delimiter && algorithmRes < delimiter){
-            mt = MetricType.TrueNegative;
+            mt = ClassificationType.TrueNegative;
         }
         cnts[mt.ordinal()]++;
     }
@@ -171,7 +180,8 @@ public class Metrics {
         allMetrics.set(MetricNameTypes.F_MEASURE.ordinal(),
                 (betaSqr + 1) * precision * recall / (betaSqr * precision + recall));
         allMetrics.set(MetricNameTypes.NEGATIVE_PRECISION.ordinal(), (double)cnts[3] / (cnts[3] + cnts[1]));
-        allMetrics.set(MetricNameTypes.SPECIFYCITY.ordinal(), (double)cnts[3] / (cnts[0] + cnts[1]));
+        allMetrics.set(MetricNameTypes.SPECIFYCITY.ordinal(), (double)cnts[3] / (cnts[3] + cnts[2]));
+        allMetrics.set(MetricNameTypes.SENSITIVITY.ordinal(), (double)cnts[0] / (cnts[0] + cnts[1]));
         allMetrics.set(MetricNameTypes.FALSE_DISCOVERY_RATE.ordinal(), (double)cnts[2] / (cnts[2] + cnts[0]));
         allMetrics.set(MetricNameTypes.FALSE_POSITIVE_RATE.ordinal(), (double)cnts[2] / (cnts[3] + cnts[1]));
         allMetrics.set(MetricNameTypes.ALPHA_ERROR.ordinal(), cnts[2] / sum);
@@ -185,10 +195,6 @@ public class Metrics {
     private double countDenomTerm(int numb1, int numb2){
         return Math.log(cnts[numb1] + cnts[numb2]);
     }
-    
-//    private double getMetric(int number){//"1 + " - to avoid the NaN case
-//        return (1 + (double) cnts[0]) / (1 + cnts[0] + cnts[number]);
-//    }
     
     private double getMetric(int number){//"1 + " - to avoid the NaN case
         return (double) cnts[0] / (cnts[0] + cnts[number]);
