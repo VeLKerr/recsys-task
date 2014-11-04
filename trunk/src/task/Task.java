@@ -57,7 +57,8 @@ public class Task {
     public static void main(String[] args) throws FileNotFoundException, IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         System.out.print("Input double step for computing metrics: ");
-        double step = Double.parseDouble(br.readLine());
+        //double step = Double.parseDouble(br.readLine());
+        double step = 1; //УБРАТЬ!!!!!
         fillUsers("u.user");
         List<EstimationPool> estimationPools = new ArrayList<>();
         FileNameBuilder fnb = FileNameBuilder.getBuilder();
@@ -96,7 +97,9 @@ public class Task {
                         sc.getUserId(), sc.getItemId(), beta));
                 est.setAvgOnGender(gav.avgOn(sc.getGender()));
                 est.setAvgOnUsersWithGender(gav.avgOnUsersWithGender(sc.getUserId(), sc.getGender()));
+                scoreSupervisor.setAlgoType(AlgoType.USER_BASED);
                 est.setKNN(gav.avg(), AlgoType.USER_BASED);
+                scoreSupervisor.setAlgoType(AlgoType.ITEM_BASED);
                 est.setKNN(gav.avg(), AlgoType.ITEM_BASED);
                 est.setTrueRating(sc.getRating());
                 est.takeIntoAccMetrics();
@@ -106,7 +109,6 @@ public class Task {
                 System.err.println(r);
                 scoreSupervisor.setAlgoType(AlgoType.ITEM_BASED);
                 r = scoreSupervisor.getRating(sc);
-                System.err.println(r);
 //                gav.add(sc); //дообучение системы
             }
             ConsoleUtils.outputResults(i);
@@ -128,6 +130,5 @@ public class Task {
 //        System.out.println(EstimationPool.listPredToString(preds));
         ConsoleUtils.outputGaining(true);
         ConsoleUtils.outputPercentageMap(EstimationPool.gainingPercentage(preds), 2);
-        //System.out.println("Time for counting correlations: " + tc.getTimes(TimeChecker.TimePrecision.SEC)[0]);
     }
 }
