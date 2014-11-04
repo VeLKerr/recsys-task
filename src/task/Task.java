@@ -96,8 +96,11 @@ public class Task {
                         sc.getUserId(), sc.getItemId(), beta));
                 est.setAvgOnGender(gav.avgOn(sc.getGender()));
                 est.setAvgOnUsersWithGender(gav.avgOnUsersWithGender(sc.getUserId(), sc.getGender()));
+                est.setKNN(gav.avg(), AlgoType.USER_BASED);
+                est.setKNN(gav.avg(), AlgoType.ITEM_BASED);
                 est.setTrueRating(sc.getRating());
                 est.takeIntoAccMetrics();
+                
                 scoreSupervisor.setAlgoType(AlgoType.USER_BASED);
                 double r = scoreSupervisor.getRating(sc);
                 System.err.println(r);

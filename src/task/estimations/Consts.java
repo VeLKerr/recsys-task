@@ -21,7 +21,10 @@ public abstract class Consts {
         "baseline predictor", 
         "baseline predictor with BETA=" + Task.beta, 
         "average on gender", 
-        "avg over the users with the same gender"};
+        "avg over the users with the same gender",
+        "user-based kNN",
+        "item-based kNN"
+    };
     /**
      * Границы шкалы пользовательских оценок.
      */
