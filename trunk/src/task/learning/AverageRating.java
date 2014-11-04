@@ -41,8 +41,8 @@ public class AverageRating {
      * @return среднее значение оценок.
      */
     public double avg(){
-        double avg = sum / cnt;
-        return avg;
+//        double avg = sum / cnt;
+        return sum / cnt;
         //UNCOMMENT WHEN BUGS WILL FIXED!
 //        if(Double.isFinite(avg)){
 //            return avg;

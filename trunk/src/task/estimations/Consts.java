@@ -38,4 +38,10 @@ public abstract class Consts {
         public static final int initialDelimiter = 2;
         public static final int finalDelimiter = 5;
     }
+    
+    public static abstract class Quantities{ //TODO: Реализовать чтение из файла!
+        public static final int USERS_CNT = 943;
+        public static final int ITEMS_CNT = 1682;
+        public static final int RATINGS_CNT = 100000;
+    }
 }
