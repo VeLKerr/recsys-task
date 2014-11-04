@@ -49,6 +49,6 @@ public abstract class Consts {
     }
     
     public static abstract class Advaced{
-        public static final int MAX_MISMATCHES_DENOMINATOR = 100;
+        public static final int MAX_MISMATCHES_DENOMINATOR = 50;
     }
 }
