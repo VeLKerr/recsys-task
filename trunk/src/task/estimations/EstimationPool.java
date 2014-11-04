@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import task.knnRecommender.AlgoType;
 import task.utils.ConsoleUtils;
 import task.utils.MathUtils;
 
@@ -124,6 +125,10 @@ public class EstimationPool {
     
     public void setAvgOnUsersWithGender(double rating){
         setEstimation(7, rating);
+    }
+    
+    public void setKNN(double rating, AlgoType at){
+        setEstimation(8 + at.ordinal(), rating);
     }
     
     /**
