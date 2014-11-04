@@ -2,6 +2,7 @@ package task;
 
 import java.util.List;
 import java.util.StringTokenizer;
+import task.knnRecommender.AlgoType;
 import task.learning.Users;
 
 /**
@@ -39,6 +40,13 @@ public class Score implements Comparable<Score>{
     }
 
     public int getItemId() {
+        return itemId;
+    }
+    
+    public int getId(AlgoType at){
+        if(at == AlgoType.USER_BASED){
+            return userId;
+        }
         return itemId;
     }
 

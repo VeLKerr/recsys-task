@@ -8,8 +8,6 @@ package task.utils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import task.estimations.Consts;
@@ -18,23 +16,7 @@ import task.estimations.Consts;
  * Класс утилит.
  * @author Ivchenko Oleg (Kirius VeLKerr)
  */
-public abstract class MathUtils {
-    public static abstract class Collections{
-        public static double[] asArray(Iterator<Double> it, int size){
-            double[] array = new double[size];
-            int i=0;
-            while(it.hasNext()){
-                array[i] = it.next();
-                i++;
-            }
-            return array;
-        }
-        
-        public static double[] collectAsArray(Collection<Double> coll){
-            return asArray(coll.iterator(), coll.size());
-        }
-    }
-    
+public abstract class MathUtils {    
     public static abstract class AvgCountMethods{
         public static double[] avgListD(List<double[]> list){
             double[] res = new double[list.get(0).length];

@@ -12,6 +12,8 @@ import java.util.List;
 import task.estimations.EstimationPool;
 import task.estimations.Metrics;
 import task.estimations.Predictor;
+import task.estimations.TimeChecker;
+import task.knnRecommender.AlgoType;
 import task.knnRecommender.ScoreSupervisor;
 import task.learning.GeneralAverageRating;
 import task.learning.Users;
@@ -23,6 +25,8 @@ import task.utils.MathUtils;
  * @author Ivchenko Oleg (Kirius VeLKerr)
  */
 public class Task {
+    private static final TimeChecker tc = new TimeChecker(1);
+    public static final int k = 5;
     /**
      * Путь к файлам с выборками.
      */
@@ -59,10 +63,10 @@ public class Task {
         FileNameBuilder fnb = FileNameBuilder.getBuilder();
         String line = null;
         Score sc  = null;
-        for(int i=1; i<=testCnt; i++){//change to testCnt
+        for(int i=1; i<=1; i++){//change to testCnt
             //Обучение
             GeneralAverageRating gav = new GeneralAverageRating();
-            ScoreSupervisor scoreSupervisor = new ScoreSupervisor();
+            ScoreSupervisor scoreSupervisor = new ScoreSupervisor(k);
             fnb.setParameters(i, false);
             File data = new File(path + fnb.buildFName());
             br = new BufferedReader(new InputStreamReader(new FileInputStream(data)));
@@ -94,6 +98,12 @@ public class Task {
                 est.setAvgOnUsersWithGender(gav.avgOnUsersWithGender(sc.getUserId(), sc.getGender()));
                 est.setTrueRating(sc.getRating());
                 est.takeIntoAccMetrics();
+                scoreSupervisor.setAlgoType(AlgoType.USER_BASED);
+                double r = scoreSupervisor.getRating(sc);
+                System.err.println(r);
+                scoreSupervisor.setAlgoType(AlgoType.ITEM_BASED);
+                r = scoreSupervisor.getRating(sc);
+                System.err.println(r);
 //                gav.add(sc); //дообучение системы
             }
             ConsoleUtils.outputResults(i);
@@ -115,5 +125,6 @@ public class Task {
 //        System.out.println(EstimationPool.listPredToString(preds));
         ConsoleUtils.outputGaining(true);
         ConsoleUtils.outputPercentageMap(EstimationPool.gainingPercentage(preds), 2);
+        //System.out.println("Time for counting correlations: " + tc.getTimes(TimeChecker.TimePrecision.SEC)[0]);
     }
 }

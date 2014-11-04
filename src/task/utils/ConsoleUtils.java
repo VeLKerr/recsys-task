@@ -59,4 +59,15 @@ public class ConsoleUtils {
         }
         return sb;
     }
+    
+    public static <K> String listlistToString(List<List<K>> list){
+        StringBuilder sb = new StringBuilder();
+        for(List<K> l: list){
+            for(K el: l){
+                sb.append(el.toString()).append(" ");
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
 }
