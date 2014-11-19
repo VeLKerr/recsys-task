@@ -131,6 +131,10 @@ public class EstimationPool {
         setEstimation(8 + at.ordinal(), rating);
     }
     
+    public void setSimpleSVD(double rating){
+        setEstimation(10, rating);
+    }
+    
     /**
      * Сохранить эталонную оценку пользователем этого item'a.
      * @param rating значение оценки.

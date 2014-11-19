@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import task.estimations.Consts;
 import task.estimations.EstimationPool;
 import task.estimations.Metrics;
 import task.estimations.Predictor;
@@ -17,6 +18,7 @@ import task.knnRecommender.AlgoType;
 import task.knnRecommender.ScoreSupervisor;
 import task.learning.GeneralAverageRating;
 import task.learning.Users;
+import task.svdRecommender.SVDBuilder;
 import task.utils.FileNameBuilder;
 import task.utils.MathUtils;
 
@@ -26,7 +28,6 @@ import task.utils.MathUtils;
  */
 public class Task {
     private static final TimeChecker tc = new TimeChecker(1);
-    public static final int k = 5;
     /**
      * Путь к файлам с выборками.
      */
@@ -56,7 +57,7 @@ public class Task {
      */
     public static void main(String[] args) throws FileNotFoundException, IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        System.out.print("Input double step for computing metrics: ");
+        //System.out.print("Input double step for computing metrics: ");
         //double step = Double.parseDouble(br.readLine());
         double step = 1; //УБРАТЬ!!!!!
         fillUsers("u.user");
@@ -67,7 +68,7 @@ public class Task {
         for(int i=1; i<=1; i++){//change to testCnt
             //Обучение
             GeneralAverageRating gav = new GeneralAverageRating();
-            ScoreSupervisor scoreSupervisor = new ScoreSupervisor(k);
+            ScoreSupervisor scoreSupervisor = new ScoreSupervisor(Consts.KNN.k);
             fnb.setParameters(i, false);
             File data = new File(path + fnb.buildFName());
             br = new BufferedReader(new InputStreamReader(new FileInputStream(data)));
@@ -76,7 +77,8 @@ public class Task {
                 gav.add(sc);
                 scoreSupervisor.add(sc);
             }
-            //Тестировка и дообучение
+            //Тестировка
+            SVDBuilder svdb = new SVDBuilder(scoreSupervisor);
             EstimationPool est = new EstimationPool(step);
             fnb.setIsTest(true);
             data = new File(path + fnb.buildFName());
@@ -98,10 +100,13 @@ public class Task {
                         sc.getUserId(), sc.getItemId(), beta));
                 est.setAvgOnGender(gav.avgOn(sc.getGender()));
                 est.setAvgOnUsersWithGender(gav.avgOnUsersWithGender(sc.getUserId(), sc.getGender()));
-                scoreSupervisor.setAlgoType(AlgoType.USER_BASED);
-                est.setKNN(scoreSupervisor.getRating(sc), AlgoType.USER_BASED);
-                scoreSupervisor.setAlgoType(AlgoType.ITEM_BASED);
-                est.setKNN(scoreSupervisor.getRating(sc), AlgoType.ITEM_BASED);
+//                scoreSupervisor.setAlgoType(AlgoType.USER_BASED);
+//                est.setKNN(scoreSupervisor.getRating(sc), AlgoType.USER_BASED);
+//                scoreSupervisor.setAlgoType(AlgoType.ITEM_BASED);
+//                est.setKNN(scoreSupervisor.getRating(sc), AlgoType.ITEM_BASED);
+                est.setKNN(gav.avg(), AlgoType.USER_BASED);
+                est.setKNN(gav.avg(), AlgoType.ITEM_BASED);
+                est.setSimpleSVD(svdb.getSimplePrediciton(sc));
                 est.setTrueRating(sc.getRating());
                 est.takeIntoAccMetrics();
                 System.out.println(__cnter);

@@ -11,6 +11,7 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.Random;
 import task.estimations.Consts;
+import task.utils.exceptions.IncorrectVectorLengthException;
 
 /**
  * Класс утилит.
@@ -58,6 +59,30 @@ public abstract class MathUtils {
             }
             return res;
         }
+        
+        /**
+         *
+         * @param mas the value of mas
+         * @return the double
+         */
+        public static double sum(double [] mas) {
+            double res = 0;
+            for (double el : mas) {
+                res += el;
+            }
+            return res;
+        }
+    }
+    
+    public static double scalarMultiply(double[] x, double[] y){
+        if(x.length != y.length){
+            throw new IncorrectVectorLengthException(x.length, y.length);
+        }
+        double res = 0.0;
+        for(int i=0; i<x.length; i++){
+            res += x[i] * y[i];
+        }
+        return res;
     }
     /**
      * Экземпляр генератора случайных чисел.

@@ -64,7 +64,7 @@ public class ScoreSupervisor {
         double[] ethalon = get(sc.getId(at) - 1);
         int cnt = 0;
         int mLimit = 0;
-        while(cnt < k && mLimit < getSize(at) / Consts.Advaced.MAX_MISMATCHES_DENOMINATOR){
+        while(cnt < k && mLimit < getSize(at) / Consts.KNN.MAX_MISMATCHES_DENOMINATOR){
             List<Integer> indexes = new ArrayList<>();
             for(int i=0; i<getSize(at); i++){
                 if(i != sc.getId(at) - 1 && 
@@ -148,5 +148,9 @@ public class ScoreSupervisor {
         } catch (NewUserOrItemException ex) {
             return MathUtils.randomRating();
         }
+    }
+    
+    public RealMatrix getScoreMtrix(){
+        return scoreMatrix;
     }
 }
