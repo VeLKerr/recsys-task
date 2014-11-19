@@ -23,7 +23,8 @@ public abstract class Consts {
         "average on gender", 
         "avg over the users with the same gender",
         "user-based kNN",
-        "item-based kNN"
+        "item-based kNN",
+        "simple SVD"
     };
     /**
      * Границы шкалы пользовательских оценок.
@@ -48,7 +49,12 @@ public abstract class Consts {
         public static final int RATINGS_CNT = 100000;
     }
     
-    public static abstract class Advaced{
-        public static final int MAX_MISMATCHES_DENOMINATOR = 50;
+    public static abstract class KNN{
+        public static final int MAX_MISMATCHES_DENOMINATOR = 400;
+        public static final int k = 20;
+    }
+    
+    public static abstract class SVD{
+        public static final double LAMBDA = 1 / 10;
     }
 }
