@@ -1,0 +1,1 @@
+Realization of the simplest predictors
